@@ -3,11 +3,33 @@
 
 @custom-variant dark (&:is(.dark *));
 
+/* =========================================
+   ORGANIC PET APP DESIGN SYSTEM v1.0
+   Warm, friendly, and organic design
+   ========================================= */
+
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
   --font-sans: var(--font-geist-sans);
   --font-mono: var(--font-geist-mono);
+  --font-display: var(--font-quicksand);
+  
+  /* Organic Colors */
+  --color-olive: #5A6B4A;
+  --color-sage: #6B7D5A;
+  --color-lime: #C5E384;
+  --color-lime-hover: #B8D974;
+  --color-teal-soft: #7FB5B5;
+  --color-cream: #FAF6F1;
+  --color-beige: #F5F0E8;
+  --color-charcoal: #2D2D2D;
+  --color-muted-gray: #6B6B6B;
+  --color-lavender: #C8B8D9;
+  --color-terracotta: #C4724A;
+  --color-soft-pink: #E8D4D4;
+  
+  /* shadcn theme overrides */
   --color-sidebar-ring: var(--sidebar-ring);
   --color-sidebar-border: var(--sidebar-border);
   --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
@@ -37,88 +59,86 @@
   --color-popover: var(--popover);
   --color-card-foreground: var(--card-foreground);
   --color-card: var(--card);
-  --radius-sm: calc(var(--radius) - 4px);
-  --radius-md: calc(var(--radius) - 2px);
-  --radius-lg: var(--radius);
-  --radius-xl: calc(var(--radius) + 4px);
-  --radius-2xl: calc(var(--radius) + 8px);
-  --radius-3xl: calc(var(--radius) + 12px);
-  --radius-4xl: calc(var(--radius) + 16px);
+  
+  /* Organic Border Radius */
+  --radius-sm: 8px;
+  --radius-md: 16px;
+  --radius-lg: 24px;
+  --radius-xl: 32px;
+  --radius-2xl: 40px;
+  --radius-card: 32px;
+  --radius-button: 9999px;
+  --radius-tag: 16px;
+  --radius-input: 24px;
 }
 
 :root {
-  --radius: 0.625rem;
-  --background: oklch(1 0 0);
-  --foreground: oklch(0.145 0 0);
-  --card: oklch(1 0 0);
-  --card-foreground: oklch(0.145 0 0);
-  --popover: oklch(1 0 0);
-  --popover-foreground: oklch(0.145 0 0);
-  --primary: oklch(0.205 0 0);
-  --primary-foreground: oklch(0.985 0 0);
-  --secondary: oklch(0.97 0 0);
-  --secondary-foreground: oklch(0.205 0 0);
-  --muted: oklch(0.97 0 0);
-  --muted-foreground: oklch(0.556 0 0);
-  --accent: oklch(0.97 0 0);
-  --accent-foreground: oklch(0.205 0 0);
-  --destructive: oklch(0.577 0.245 27.325);
-  --border: oklch(0.922 0 0);
-  --input: oklch(0.922 0 0);
-  --ring: oklch(0.708 0 0);
-  --chart-1: oklch(0.646 0.222 41.116);
-  --chart-2: oklch(0.6 0.118 184.704);
-  --chart-3: oklch(0.398 0.07 227.392);
-  --chart-4: oklch(0.828 0.189 84.429);
-  --chart-5: oklch(0.769 0.188 70.08);
-  --sidebar: oklch(0.985 0 0);
-  --sidebar-foreground: oklch(0.145 0 0);
-  --sidebar-primary: oklch(0.205 0 0);
-  --sidebar-primary-foreground: oklch(0.985 0 0);
-  --sidebar-accent: oklch(0.97 0 0);
-  --sidebar-accent-foreground: oklch(0.205 0 0);
-  --sidebar-border: oklch(0.922 0 0);
-  --sidebar-ring: oklch(0.708 0 0);
+  --radius: 24px;
   
-  /* Premium Design Variables */
-  --shadow-soft: 0 2px 8px rgba(0, 0, 0, 0.04);
-  --shadow-medium: 0 4px 16px rgba(0, 0, 0, 0.08);
-  --shadow-deep: 0 8px 32px rgba(0, 0, 0, 0.12);
-  --shadow-hover: 0 12px 40px rgba(0, 0, 0, 0.16);
+  /* Organic Color Palette */
+  --background: #7FB5B5; /* soft-teal-background */
+  --foreground: #2D2D2D; /* charcoal */
+  --card: #FAF6F1; /* warm-cream */
+  --card-foreground: #2D2D2D;
+  --popover: #FAF6F1;
+  --popover-foreground: #2D2D2D;
+  --primary: #5A6B4A; /* olive-green */
+  --primary-foreground: #FAF6F1;
+  --secondary: #F5F0E8; /* soft-beige */
+  --secondary-foreground: #2D2D2D;
+  --muted: #F5F0E8;
+  --muted-foreground: #6B6B6B; /* muted-gray */
+  --accent: #C5E384; /* lime-accent */
+  --accent-foreground: #2D2D2D;
+  --destructive: #C4724A; /* terracotta */
+  --border: rgba(90, 107, 74, 0.15);
+  --input: #F5F0E8;
+  --ring: #5A6B4A;
+  
+  /* Charts */
+  --chart-1: #5A6B4A;
+  --chart-2: #6B7D5A;
+  --chart-3: #C5E384;
+  --chart-4: #C8B8D9;
+  --chart-5: #C4724A;
+  
+  /* Sidebar */
+  --sidebar: #FAF6F1;
+  --sidebar-foreground: #2D2D2D;
+  --sidebar-primary: #5A6B4A;
+  --sidebar-primary-foreground: #FAF6F1;
+  --sidebar-accent: #F5F0E8;
+  --sidebar-accent-foreground: #2D2D2D;
+  --sidebar-border: rgba(90, 107, 74, 0.15);
+  --sidebar-ring: #5A6B4A;
+  
+  /* Organic Shadows - Subtle and soft */
+  --shadow-none: none;
+  --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.04);
+  --shadow-md: 0 4px 16px rgba(0, 0, 0, 0.06);
+  --shadow-lg: 0 8px 32px rgba(0, 0, 0, 0.08);
+  --shadow-hover: 0 12px 40px rgba(0, 0, 0, 0.1);
 }
 
 .dark {
-  --background: oklch(0.145 0 0);
-  --foreground: oklch(0.985 0 0);
-  --card: oklch(0.205 0 0);
-  --card-foreground: oklch(0.985 0 0);
-  --popover: oklch(0.205 0 0);
-  --popover-foreground: oklch(0.985 0 0);
-  --primary: oklch(0.922 0 0);
-  --primary-foreground: oklch(0.205 0 0);
-  --secondary: oklch(0.269 0 0);
-  --secondary-foreground: oklch(0.985 0 0);
-  --muted: oklch(0.269 0 0);
-  --muted-foreground: oklch(0.708 0 0);
-  --accent: oklch(0.269 0 0);
-  --accent-foreground: oklch(0.985 0 0);
-  --destructive: oklch(0.704 0.191 22.216);
-  --border: oklch(1 0 0 / 10%);
-  --input: oklch(1 0 0 / 15%);
-  --ring: oklch(0.556 0 0);
-  --chart-1: oklch(0.488 0.243 264.376);
-  --chart-2: oklch(0.696 0.17 162.48);
-  --chart-3: oklch(0.769 0.188 70.08);
-  --chart-4: oklch(0.627 0.265 303.9);
-  --chart-5: oklch(0.645 0.246 16.439);
-  --sidebar: oklch(0.205 0 0);
-  --sidebar-foreground: oklch(0.985 0 0);
-  --sidebar-primary: oklch(0.488 0.243 264.376);
-  --sidebar-primary-foreground: oklch(0.985 0 0);
-  --sidebar-accent: oklch(0.269 0 0);
-  --sidebar-accent-foreground: oklch(0.985 0 0);
-  --sidebar-border: oklch(1 0 0 / 10%);
-  --sidebar-ring: oklch(0.556 0 0);
+  --background: #1a2420;
+  --foreground: #FAF6F1;
+  --card: #2D2D2D;
+  --card-foreground: #FAF6F1;
+  --popover: #2D2D2D;
+  --popover-foreground: #FAF6F1;
+  --primary: #C5E384;
+  --primary-foreground: #2D2D2D;
+  --secondary: #3a3a3a;
+  --secondary-foreground: #FAF6F1;
+  --muted: #3a3a3a;
+  --muted-foreground: #a0a0a0;
+  --accent: #5A6B4A;
+  --accent-foreground: #FAF6F1;
+  --destructive: #C4724A;
+  --border: rgba(197, 227, 132, 0.15);
+  --input: rgba(255, 255, 255, 0.1);
+  --ring: #C5E384;
 }
 
 @layer base {
@@ -127,10 +147,18 @@
   }
   body {
     @apply bg-background text-foreground;
+    font-family: var(--font-sans), 'Inter', 'DM Sans', sans-serif;
+  }
+  h1, h2, h3, h4, h5, h6 {
+    font-family: var(--font-display), 'Quicksand', 'Nunito', sans-serif;
   }
 }
 
-/* Premium Design Animations */
+/* =========================================
+   ORGANIC ANIMATIONS
+   Gentle, smooth transitions
+   ========================================= */
+
 @keyframes fadeInUp {
   from {
     opacity: 0;
@@ -142,70 +170,171 @@
   }
 }
 
+@keyframes fadeInScale {
+  from {
+    opacity: 0;
+    transform: scale(0.95);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+@keyframes gentlePulse {
+  0%, 100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 0.8;
+    transform: scale(1.02);
+  }
+}
+
+@keyframes float {
+  0%, 100% {
+    transform: translateY(0px);
+  }
+  50% {
+    transform: translateY(-6px);
+  }
+}
+
 @keyframes spin {
   to {
     transform: rotate(360deg);
   }
 }
 
-@keyframes pulse {
-  0%, 100% {
-    opacity: 1;
-  }
-  50% {
-    opacity: 0.5;
-  }
-}
+/* =========================================
+   ORGANIC COMPONENT STYLES
+   ========================================= */
 
-/* Premium Design Utility Classes */
+/* Credits Pill - Organic badge style */
 .credits-pill {
   display: inline-flex;
   align-items: center;
   gap: 0.5rem;
-  padding: 0.5rem 1rem;
-  background: white;
-  border: 1px solid #e5e5e5;
-  border-radius: 100px;
+  padding: 0.625rem 1.25rem;
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-button);
   font-size: 0.875rem;
-  font-weight: 500;
+  font-weight: 600;
   color: var(--foreground);
   transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  box-shadow: var(--shadow-sm);
 }
 
 .credits-pill:hover {
-  border-color: var(--border);
-  box-shadow: var(--shadow-soft);
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-md);
 }
 
+/* Upload Zone - Organic dropzone */
 .upload-zone {
-  border: 2px dashed #e5e5e5 !important;
-  border-radius: 24px !important;
-  padding: 60px !important;
-  background: white;
+  border: 2px dashed rgba(90, 107, 74, 0.3) !important;
+  border-radius: var(--radius-card) !important;
+  padding: 48px 32px !important;
+  background: var(--card) !important;
   transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  cursor: pointer;
 }
 
 .upload-zone:hover {
-  transform: translateY(-2px);
+  transform: translateY(-4px);
   border-color: var(--primary) !important;
-  box-shadow: var(--shadow-medium);
+  box-shadow: var(--shadow-lg);
+  background: linear-gradient(135deg, var(--card) 0%, var(--secondary) 100%) !important;
 }
 
-.btn-generate {
-  background: #000 !important;
+.upload-zone.active {
+  border-color: var(--accent) !important;
+  background: linear-gradient(135deg, rgba(197, 227, 132, 0.1) 0%, var(--card) 100%) !important;
+}
+
+/* Primary Button - Lime accent, pill-shaped */
+.btn-primary {
+  background: var(--accent) !important;
+  color: var(--foreground) !important;
+  padding: 16px 32px !important;
+  font-size: 0.875rem !important;
+  font-weight: 700 !important;
+  text-transform: uppercase !important;
+  letter-spacing: 0.05em !important;
+  border-radius: var(--radius-button) !important;
+  border: none !important;
+  box-shadow: var(--shadow-md);
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.btn-primary:hover:not(:disabled) {
+  transform: scale(1.03) translateY(-2px);
+  box-shadow: var(--shadow-lg);
+  background: #B8D974 !important;
+}
+
+.btn-primary:active:not(:disabled) {
+  transform: scale(0.98);
+}
+
+.btn-primary:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+/* Secondary Button - Charcoal, pill-shaped */
+.btn-secondary {
+  background: var(--foreground) !important;
   color: white !important;
-  padding: 18px 32px !important;
-  font-size: 1rem !important;
+  padding: 12px 24px !important;
   font-weight: 600 !important;
-  border-radius: 12px !important;
-  box-shadow: var(--shadow-deep);
+  border-radius: var(--radius-button) !important;
+  border: none !important;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.btn-secondary:hover:not(:disabled) {
+  transform: scale(1.02);
+  box-shadow: var(--shadow-md);
+}
+
+/* Outline Button */
+.btn-outline {
+  background: transparent !important;
+  color: var(--foreground) !important;
+  border: 2px solid var(--foreground) !important;
+  padding: 12px 24px !important;
+  font-weight: 600 !important;
+  border-radius: var(--radius-button) !important;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.btn-outline:hover:not(:disabled) {
+  background: var(--foreground) !important;
+  color: white !important;
+}
+
+/* Generate Button - Special hero CTA */
+.btn-generate {
+  background: var(--accent) !important;
+  color: var(--foreground) !important;
+  padding: 20px 40px !important;
+  font-size: 1rem !important;
+  font-weight: 700 !important;
+  text-transform: uppercase !important;
+  letter-spacing: 0.05em !important;
+  border-radius: var(--radius-button) !important;
+  box-shadow: var(--shadow-lg);
   transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   border: none !important;
 }
 
 .btn-generate:hover:not(:disabled) {
-  transform: scale(1.02);
-  box-shadow: var(--shadow-hover);
+  transform: scale(1.05) translateY(-3px);
+  box-shadow: 0 16px 48px rgba(197, 227, 132, 0.4);
+  background: #B8D974 !important;
 }
 
 .btn-generate:active:not(:disabled) {
@@ -215,12 +344,88 @@
 .btn-generate:disabled {
   opacity: 0.5;
   cursor: not-allowed;
+  transform: none;
 }
 
-/* Fade-in animation utility */
+/* Organic Card */
+.organic-card {
+  background: var(--card);
+  border-radius: var(--radius-card);
+  padding: 24px 28px;
+  border: none;
+  box-shadow: var(--shadow-sm);
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.organic-card:hover {
+  transform: translateY(-4px);
+  box-shadow: var(--shadow-lg);
+}
+
+/* Organic Tag/Chip */
+.organic-tag {
+  display: inline-flex;
+  align-items: center;
+  padding: 8px 16px;
+  background: var(--accent);
+  color: var(--foreground);
+  border-radius: var(--radius-button);
+  font-size: 0.75rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.02em;
+  transition: all 0.2s ease;
+}
+
+.organic-tag.inactive {
+  background: var(--secondary);
+}
+
+/* Organic Input */
+.organic-input {
+  background: var(--secondary) !important;
+  border: 1px solid transparent !important;
+  border-radius: var(--radius-input) !important;
+  padding: 14px 20px !important;
+  transition: all 0.3s ease;
+}
+
+.organic-input:focus {
+  border-color: var(--primary) !important;
+  box-shadow: 0 0 0 3px rgba(90, 107, 74, 0.1) !important;
+}
+
+/* Organic Select Trigger */
+.organic-select {
+  background: var(--card) !important;
+  border: 1px solid var(--border) !important;
+  border-radius: var(--radius-input) !important;
+  padding: 14px 20px !important;
+  box-shadow: var(--shadow-sm);
+  transition: all 0.3s ease;
+}
+
+.organic-select:hover {
+  box-shadow: var(--shadow-md);
+  border-color: var(--primary) !important;
+}
+
+/* =========================================
+   ANIMATION UTILITIES
+   ========================================= */
+
 .fade-in-up {
   animation: fadeInUp 0.6s ease-out forwards;
   opacity: 0;
+}
+
+.fade-in-scale {
+  animation: fadeInScale 0.5s ease-out forwards;
+  opacity: 0;
+}
+
+.float {
+  animation: float 3s ease-in-out infinite;
 }
 
 .fade-in-up-delay-1 {
@@ -238,8 +443,86 @@
   opacity: 0;
 }
 
-/* Support for more delays using CSS custom properties */
+.fade-in-up-delay-4 {
+  animation: fadeInUp 0.6s ease-out 0.4s forwards;
+  opacity: 0;
+}
+
+.fade-in-up-delay-5 {
+  animation: fadeInUp 0.6s ease-out 0.5s forwards;
+  opacity: 0;
+}
+
+/* Dynamic delay support */
 [style*="--delay"] {
   animation: fadeInUp 0.6s ease-out var(--delay, 0s) forwards;
   opacity: 0;
+}
+
+/* =========================================
+   MICRO-INTERACTIONS
+   ========================================= */
+
+.hover-lift {
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.hover-lift:hover {
+  transform: translateY(-4px);
+  box-shadow: var(--shadow-lg);
+}
+
+.hover-scale {
+  transition: transform 0.2s ease;
+}
+
+.hover-scale:hover {
+  transform: scale(1.02);
+}
+
+/* =========================================
+   LAYOUT UTILITIES
+   ========================================= */
+
+.organic-container {
+  max-width: 800px;
+  margin: 0 auto;
+  padding: 0 24px;
+}
+
+.organic-section {
+  margin-bottom: 32px;
+}
+
+/* Gradient backgrounds */
+.bg-organic-gradient {
+  background: linear-gradient(135deg, var(--background) 0%, #6BA3A3 100%);
+}
+
+.bg-card-gradient {
+  background: linear-gradient(135deg, var(--card) 0%, var(--secondary) 100%);
+}
+
+/* Decorative elements */
+.organic-blob {
+  border-radius: 60% 40% 30% 70% / 60% 30% 70% 40%;
+}
+
+/* =========================================
+   RESPONSIVE ADJUSTMENTS
+   ========================================= */
+
+@media (max-width: 640px) {
+  .upload-zone {
+    padding: 32px 20px !important;
+  }
+  
+  .btn-generate {
+    padding: 16px 32px !important;
+    width: 100%;
+  }
+  
+  .organic-container {
+    padding: 0 20px;
+  }
 }

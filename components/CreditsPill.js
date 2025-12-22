@@ -9,8 +9,8 @@ export default function CreditsPill() {
   if (loading) {
     return (
       <div className="credits-pill">
-        <Sparkles className="h-4 w-4" />
-        <span>...</span>
+        <div className="w-4 h-4 rounded-full bg-secondary animate-pulse" />
+        <span className="text-muted-foreground">...</span>
       </div>
     );
   }
@@ -19,10 +19,15 @@ export default function CreditsPill() {
     return null;
   }
 
+  const isLow = credits <= 3;
+  const isEmpty = credits === 0;
+
   return (
-    <div className="credits-pill">
-      <Sparkles className="h-4 w-4 text-primary" />
-      <span>{credits} crédito{credits !== 1 ? 's' : ''}</span>
+    <div className={`credits-pill ${isEmpty ? 'bg-soft-pink/50 border-terracotta/30' : isLow ? 'bg-lavender/30' : ''}`}>
+      <Sparkles className={`h-4 w-4 ${isEmpty ? 'text-terracotta' : 'text-primary'}`} />
+      <span className={isEmpty ? 'text-terracotta' : ''}>
+        {credits} crédito{credits !== 1 ? 's' : ''}
+      </span>
     </div>
   );
 }

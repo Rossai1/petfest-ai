@@ -1,9 +1,8 @@
 'use client';
 
 import { useState } from 'react';
-import { Download, X, Loader2 } from 'lucide-react';
+import { Download, X, Loader2, Sparkles } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import { Card } from '@/components/ui/card';
 import Image from 'next/image';
 
 export default function ResultGallery({ results, isLoading }) {
@@ -29,9 +28,12 @@ export default function ResultGallery({ results, isLoading }) {
 
   if (isLoading) {
     return (
-      <div className="flex flex-col items-center justify-center py-12 space-y-4">
-        <Loader2 className="h-8 w-8 animate-spin text-primary" />
-        <p className="text-muted-foreground">Processando imagens...</p>
+      <div className="organic-card flex flex-col items-center justify-center py-12 space-y-4">
+        <div className="w-16 h-16 rounded-full bg-accent/30 flex items-center justify-center">
+          <Loader2 className="h-8 w-8 animate-spin text-primary" />
+        </div>
+        <p className="text-muted-foreground font-medium">Processando suas imagens...</p>
+        <p className="text-sm text-muted-foreground/70">Isso pode levar alguns segundos</p>
       </div>
     );
   }
@@ -42,92 +44,92 @@ export default function ResultGallery({ results, isLoading }) {
 
   return (
     <>
-      <div className="space-y-4 fade-in-up">
+      <div className="organic-card space-y-6 fade-in-up">
         <div className="flex items-center justify-between">
-          <h2 className="text-2xl font-bold">Resultados</h2>
-          <p className="text-sm text-muted-foreground">
-            {results.length} {results.length === 1 ? 'imagem processada' : 'imagens processadas'}
-          </p>
+          <div className="flex items-center gap-3">
+            <div className="w-10 h-10 rounded-full bg-accent/30 flex items-center justify-center">
+              <Sparkles className="h-5 w-5 text-primary" />
+            </div>
+            <h2 className="text-2xl font-bold text-foreground">Resultados</h2>
+          </div>
+          <span className="organic-tag">
+            {results.length} {results.length === 1 ? 'imagem' : 'imagens'}
+          </span>
         </div>
+        
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
           {results.map((result, index) => {
             const delay = Math.min(index * 0.1, 0.5);
             return (
-              <Card 
+              <div 
                 key={index} 
-                className="overflow-hidden group transition-all duration-300 hover:shadow-[var(--shadow-hover)]"
+                className="organic-card !p-0 overflow-hidden group hover-lift"
                 style={{ 
                   '--delay': `${delay}s`,
                   animation: `fadeInUp 0.6s ease-out ${delay}s forwards`,
                   opacity: 0
                 }}
               >
-              <div className="relative aspect-square bg-muted">
-                {result.error || !result.success ? (
-                  <div className="flex flex-col items-center justify-center h-full p-4 text-center">
-                    <X className="h-12 w-12 text-destructive mb-2" />
-                    <p className="text-sm font-medium text-destructive">Erro ao processar</p>
-                    <p className="text-xs text-muted-foreground mt-1">
-                      {result.error || 'Erro desconhecido'}
-                    </p>
-                  </div>
-                ) : (
-                  <>
-                    {result.url ? (
-                      <Image
-                        src={result.url}
-                        alt={`Resultado ${index + 1}`}
-                        fill
-                        unoptimized={result.url.includes('supabase.co')}
-                        className="object-cover cursor-pointer transition-transform duration-300 group-hover:scale-105"
-                        onClick={() => setSelectedImage(result.url)}
-                        onError={(e) => {
-                          console.error('Erro ao carregar imagem:', result.url);
-                        }}
-                      />
-                    ) : (
-                      <div className="flex flex-col items-center justify-center h-full p-4 text-center">
-                        <X className="h-12 w-12 text-muted-foreground mb-2" />
-                        <p className="text-sm font-medium text-muted-foreground">URL da imagem não disponível</p>
+                <div className="relative aspect-square bg-secondary">
+                  {result.error || !result.success ? (
+                    <div className="flex flex-col items-center justify-center h-full p-4 text-center">
+                      <div className="w-16 h-16 rounded-full bg-soft-pink/50 flex items-center justify-center mb-3">
+                        <X className="h-8 w-8 text-terracotta" />
                       </div>
-                    )}
-                    <div className="absolute inset-0 bg-black/0 group-hover:bg-black/30 transition-all duration-300 flex items-center justify-center opacity-0 group-hover:opacity-100">
-                      <Button
-                        variant="secondary"
-                        size="sm"
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          downloadImage(result.url, index);
-                        }}
-                        className="transform translate-y-2 group-hover:translate-y-0 transition-transform duration-300"
-                      >
-                        <Download className="h-4 w-4 mr-2" />
-                        Baixar
-                      </Button>
+                      <p className="text-sm font-semibold text-terracotta">Erro ao processar</p>
+                      <p className="text-xs text-muted-foreground mt-1">
+                        {result.error || 'Erro desconhecido'}
+                      </p>
                     </div>
-                  </>
-                )}
-              </div>
-              <div className="p-4">
-                <div className="flex items-center justify-between">
-                  <p className="text-sm font-medium">Imagem {index + 1}</p>
-                  {result.success && !result.error && (
+                  ) : (
+                    <>
+                      {result.url ? (
+                        <Image
+                          src={result.url}
+                          alt={`Resultado ${index + 1}`}
+                          fill
+                          unoptimized={result.url.includes('supabase.co')}
+                          className="object-cover cursor-pointer transition-transform duration-500 group-hover:scale-105"
+                          onClick={() => setSelectedImage(result.url)}
+                          onError={(e) => {
+                            console.error('Erro ao carregar imagem:', result.url);
+                          }}
+                        />
+                      ) : (
+                        <div className="flex flex-col items-center justify-center h-full p-4 text-center">
+                          <X className="h-12 w-12 text-muted-foreground mb-2" />
+                          <p className="text-sm font-medium text-muted-foreground">URL não disponível</p>
+                        </div>
+                      )}
+                      <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-all duration-300 flex items-end justify-center pb-6">
+                        <Button
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            downloadImage(result.url, index);
+                          }}
+                          className="btn-primary !py-3 !px-6 transform translate-y-4 group-hover:translate-y-0 transition-transform duration-300"
+                        >
+                          <Download className="h-4 w-4 mr-2" />
+                          Baixar
+                        </Button>
+                      </div>
+                    </>
+                  )}
+                </div>
+                <div className="p-4 flex items-center justify-between">
+                  <p className="text-sm font-semibold text-foreground">Imagem {index + 1}</p>
+                  {result.success && !result.error && result.url && (
                     <Button
                       variant="ghost"
                       size="sm"
                       onClick={() => downloadImage(result.url, index)}
+                      className="text-muted-foreground hover:text-foreground rounded-full"
                     >
                       <Download className="h-4 w-4" />
                     </Button>
                   )}
                 </div>
-                {result.revisedPrompt && (
-                  <p className="text-xs text-muted-foreground mt-2 line-clamp-2">
-                    {result.revisedPrompt}
-                  </p>
-                )}
               </div>
-            </Card>
             );
           })}
         </div>
@@ -136,19 +138,19 @@ export default function ResultGallery({ results, isLoading }) {
       {/* Modal para visualização ampliada */}
       {selectedImage && (
         <div
-          className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 p-4"
+          className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 p-4 backdrop-blur-sm"
           onClick={() => setSelectedImage(null)}
         >
-          <div className="relative max-w-4xl max-h-[90vh] w-full">
+          <div className="relative max-w-4xl max-h-[90vh] w-full fade-in-scale">
             <Button
               variant="ghost"
               size="icon"
-              className="absolute top-4 right-4 z-10 bg-background/80 hover:bg-background"
+              className="absolute top-4 right-4 z-10 bg-card/90 hover:bg-card rounded-full h-10 w-10"
               onClick={() => setSelectedImage(null)}
             >
-              <X className="h-4 w-4" />
+              <X className="h-5 w-5" />
             </Button>
-            <div className="relative w-full aspect-square bg-muted rounded-lg overflow-hidden">
+            <div className="relative w-full aspect-square bg-secondary rounded-[32px] overflow-hidden shadow-2xl">
               <Image
                 src={selectedImage}
                 alt="Visualização ampliada"
@@ -157,10 +159,22 @@ export default function ResultGallery({ results, isLoading }) {
                 className="object-contain"
               />
             </div>
+            <div className="mt-6 flex justify-center">
+              <Button
+                onClick={(e) => {
+                  e.stopPropagation();
+                  const index = results.findIndex(r => r.url === selectedImage);
+                  downloadImage(selectedImage, index >= 0 ? index : 0);
+                }}
+                className="btn-primary"
+              >
+                <Download className="h-5 w-5 mr-2" />
+                Baixar Imagem
+              </Button>
+            </div>
           </div>
         </div>
       )}
     </>
   );
 }
-

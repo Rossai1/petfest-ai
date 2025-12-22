@@ -2,7 +2,7 @@
 
 import { useCallback, useState } from 'react';
 import { useDropzone } from 'react-dropzone';
-import { Upload, X } from 'lucide-react';
+import { Upload, X, ImageIcon } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import Image from 'next/image';
 
@@ -88,28 +88,30 @@ export default function ImageUploader({ files, onFilesChange }) {
     <div className="w-full space-y-4">
       <div
         {...getRootProps()}
-        className={`upload-zone cursor-pointer ${
+        className={`upload-zone ${
           isDragActive
-            ? 'border-primary !bg-primary/5'
+            ? 'active !border-accent'
             : ''
         } ${files.length >= MAX_FILES ? 'opacity-50 cursor-not-allowed' : ''}`}
       >
         <input {...getInputProps()} />
         <div className="flex flex-col items-center justify-center gap-4 text-center">
-          <Upload className="h-12 w-12 text-muted-foreground" />
+          <div className="w-16 h-16 rounded-full bg-secondary flex items-center justify-center">
+            <Upload className="h-8 w-8 text-primary" />
+          </div>
           {files.length >= MAX_FILES ? (
             <div>
-              <p className="text-lg font-medium">Limite de {MAX_FILES} imagens atingido</p>
-              <p className="text-sm text-muted-foreground">
+              <p className="text-lg font-semibold text-foreground">Limite de {MAX_FILES} imagens atingido</p>
+              <p className="text-sm text-muted-foreground mt-1">
                 Remova algumas imagens para adicionar novas
               </p>
             </div>
           ) : (
             <div>
-              <p className="text-lg font-medium">
+              <p className="text-lg font-semibold text-foreground">
                 {isDragActive ? 'Solte as imagens aqui' : 'Arraste imagens ou clique para selecionar'}
               </p>
-              <p className="text-sm text-muted-foreground">
+              <p className="text-sm text-muted-foreground mt-1">
                 PNG, JPEG ou WebP (máx 4MB cada) • Até {MAX_FILES} imagens
               </p>
             </div>
@@ -118,9 +120,9 @@ export default function ImageUploader({ files, onFilesChange }) {
       </div>
 
       {errors.length > 0 && (
-        <div className="rounded-md bg-destructive/10 border border-destructive/20 p-4">
-          <p className="text-sm font-medium text-destructive mb-2">Erros encontrados:</p>
-          <ul className="text-sm text-destructive/80 space-y-1">
+        <div className="organic-card bg-soft-pink/30 border border-terracotta/20">
+          <p className="text-sm font-medium text-terracotta mb-2">Erros encontrados:</p>
+          <ul className="text-sm text-terracotta/80 space-y-1">
             {errors.map((error, index) => (
               <li key={index}>• {error}</li>
             ))}
@@ -129,35 +131,40 @@ export default function ImageUploader({ files, onFilesChange }) {
       )}
 
       {files.length > 0 && (
-        <div className="space-y-3">
+        <div className="organic-card space-y-4">
           <div className="flex items-center justify-between">
-            <p className="text-sm font-medium">
+            <p className="text-sm font-semibold text-foreground">
               {files.length} {files.length === 1 ? 'imagem selecionada' : 'imagens selecionadas'}
             </p>
-            <Button variant="ghost" size="sm" onClick={clearAll}>
+            <Button 
+              variant="ghost" 
+              size="sm" 
+              onClick={clearAll}
+              className="text-muted-foreground hover:text-foreground rounded-full"
+            >
               Limpar todas
             </Button>
           </div>
           <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4">
             {files.map((file, index) => (
               <div key={index} className="relative group">
-                <div className="aspect-square rounded-lg overflow-hidden border bg-muted">
+                <div className="aspect-square rounded-[16px] overflow-hidden bg-secondary border border-border">
                   <Image
                     src={file.preview}
                     alt={`Preview ${index + 1}`}
                     fill
-                    className="object-cover"
+                    className="object-cover transition-transform duration-300 group-hover:scale-105"
                   />
                 </div>
                 <Button
                   variant="destructive"
                   size="icon"
-                  className="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity"
+                  className="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity h-7 w-7 rounded-full bg-terracotta hover:bg-terracotta/90"
                   onClick={() => removeFile(index)}
                 >
                   <X className="h-4 w-4" />
                 </Button>
-                <p className="mt-1 text-xs text-muted-foreground truncate">{file.name}</p>
+                <p className="mt-2 text-xs text-muted-foreground truncate">{file.name}</p>
               </div>
             ))}
           </div>
@@ -166,4 +173,3 @@ export default function ImageUploader({ files, onFilesChange }) {
     </div>
   );
 }
-

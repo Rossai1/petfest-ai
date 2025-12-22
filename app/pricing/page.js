@@ -3,9 +3,9 @@
 import { useEffect, useState } from 'react';
 import { useUser } from '@clerk/nextjs';
 import PricingCard from '@/components/PricingCard';
-import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Sparkles, Home } from 'lucide-react';
+import Logo from '@/components/Logo';
+import { Sparkles, ArrowLeft, PawPrint } from 'lucide-react';
 import Link from 'next/link';
 
 export default function PricingPage() {
@@ -78,74 +78,99 @@ export default function PricingPage() {
   ];
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-background to-muted/20">
-      <div className="container mx-auto px-4 py-16 max-w-6xl">
+    <div className="min-h-screen bg-organic-gradient">
+      <div className="container mx-auto px-4 py-8 max-w-6xl">
         {/* Header com navegação */}
-        <div className="mb-8">
-          <Button asChild variant="ghost" className="mb-4">
+        <div className="mb-8 fade-in-up">
+          <Button asChild variant="ghost" className="rounded-full text-foreground/80 hover:text-foreground hover:bg-card/50">
             <Link href="/">
-              <Home className="h-4 w-4 mr-2" />
+              <ArrowLeft className="h-4 w-4 mr-2" />
               Voltar para Home
             </Link>
           </Button>
         </div>
 
-        <div className="text-center mb-12">
-          <div className="flex items-center justify-center gap-3 mb-4">
-            <Sparkles className="h-8 w-8 text-primary" />
-            <h1 className="text-4xl font-bold">Planos e Preços</h1>
+        {/* Hero */}
+        <div className="text-center mb-12 fade-in-up-delay-1">
+          <div className="inline-flex items-center justify-center mb-6">
+            <Logo size={64} />
           </div>
-          <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
-            Escolha o plano ideal para suas necessidades. Todos os planos incluem acesso a todos os temas.
+          <h1 className="text-4xl md:text-5xl font-bold text-foreground mb-4">
+            Planos e Preços
+          </h1>
+          <p className="text-lg text-foreground/70 max-w-2xl mx-auto">
+            Escolha o plano ideal para suas necessidades. Todos os planos incluem acesso a todos os temas festivos.
           </p>
         </div>
 
         {loading ? (
           <div className="flex justify-center py-12">
-            <div className="animate-pulse text-muted-foreground">Carregando...</div>
+            <div className="organic-card animate-pulse">
+              <div className="flex items-center gap-3">
+                <div className="w-8 h-8 rounded-full bg-secondary" />
+                <div className="h-4 w-32 bg-secondary rounded-full" />
+              </div>
+            </div>
           </div>
         ) : (
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-            {plans.map((planData) => (
-              <PricingCard
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 fade-in-up-delay-2">
+            {plans.map((planData, index) => (
+              <div 
                 key={planData.plan}
-                plan={planData.plan}
-                price={planData.price}
-                limit={planData.limit}
-                quality={planData.quality}
-                features={planData.features}
-                isPopular={planData.isPopular}
-                currentPlan={currentPlan}
-              />
+                style={{ '--delay': `${0.1 * (index + 1)}s` }}
+                className="fade-in-up"
+              >
+                <PricingCard
+                  plan={planData.plan}
+                  price={planData.price}
+                  limit={planData.limit}
+                  quality={planData.quality}
+                  features={planData.features}
+                  isPopular={planData.isPopular}
+                  currentPlan={currentPlan}
+                />
+              </div>
             ))}
           </div>
         )}
 
-        <Card className="mt-12 p-6">
-          <h2 className="text-xl font-semibold mb-4">Perguntas Frequentes</h2>
-          <div className="space-y-4 text-sm">
-            <div>
-              <p className="font-medium mb-1">Como funciona o reset mensal?</p>
+        {/* FAQ Section */}
+        <div className="organic-card mt-12 fade-in-up-delay-3">
+          <h2 className="text-2xl font-bold text-foreground mb-6 flex items-center gap-3">
+            <PawPrint className="h-6 w-6 text-primary" />
+            Perguntas Frequentes
+          </h2>
+          <div className="space-y-6">
+            <div className="pb-4 border-b border-border">
+              <p className="font-semibold text-foreground mb-2">Como funciona o reset mensal?</p>
               <p className="text-muted-foreground">
                 Seu contador de imagens é resetado automaticamente todo mês, permitindo que você use novamente todas as imagens do seu plano.
               </p>
             </div>
-            <div>
-              <p className="font-medium mb-1">Posso mudar de plano a qualquer momento?</p>
+            <div className="pb-4 border-b border-border">
+              <p className="font-semibold text-foreground mb-2">Posso mudar de plano a qualquer momento?</p>
               <p className="text-muted-foreground">
                 Sim! Você pode fazer upgrade ou downgrade a qualquer momento. As mudanças são aplicadas imediatamente.
               </p>
             </div>
             <div>
-              <p className="font-medium mb-1">O que acontece se eu exceder o limite?</p>
+              <p className="font-semibold text-foreground mb-2">O que acontece se eu exceder o limite?</p>
               <p className="text-muted-foreground">
                 Você receberá uma notificação quando estiver próximo do limite. Ao atingir o limite, você precisará fazer upgrade ou aguardar o reset mensal.
               </p>
             </div>
           </div>
-        </Card>
+        </div>
+
+        {/* Footer */}
+        <footer className="mt-16 text-center text-sm text-foreground/60 fade-in-up-delay-4">
+          <p className="flex items-center justify-center gap-2">
+            <PawPrint className="h-4 w-4" />
+            Feito com amor para seus pets
+            <PawPrint className="h-4 w-4" />
+          </p>
+        </footer>
       </div>
     </div>
   );
 }
-
