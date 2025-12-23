@@ -20,8 +20,9 @@ export async function GET() {
       );
     }
 
-    // `userResult` pode conter { ...user, linkedCredits: true/false }
-    const { linkedCredits, ...user } = userResult;
+    // `userResult` pode conter { ...user, linkedCredits: true/false, conflict?: true }
+    // Extrair apenas linkedCredits e conflict, deixando o resto como user
+    const { linkedCredits, conflict, ...user } = userResult;
 
     // Validar que o usuário tem os campos necessários
     if (!user || !user.id) {
