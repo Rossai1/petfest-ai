@@ -11,14 +11,16 @@ datasource db {
 
 // Usando as tabelas existentes do Supabase
 model User {
-  id               String       @id @default(uuid()) @db.Uuid
-  clerkId          String       @unique @map("clerk_id")
-  email            String?
-  stripeCustomerId String?      @unique @map("stripe_customer_id")
-  creditsRemaining Int          @default(3) @map("credits_remaining")
-  planType         String       @default("free") @map("plan_type")
-  createdAt        DateTime     @default(now()) @map("created_at") @db.Timestamptz(6)
-  generations      Generation[]
+  id                String        @id @default(uuid()) @db.Uuid
+  clerkId           String        @unique @map("clerk_id")
+  email             String?
+  stripeCustomerId  String?       @unique @map("stripe_customer_id")
+  abacateCustomerId String?       @unique @map("abacate_customer_id")
+  creditsRemaining  Int           @default(3) @map("credits_remaining")
+  planType          String        @default("free") @map("plan_type")
+  createdAt         DateTime      @default(now()) @map("created_at") @db.Timestamptz(6)
+  generations       Generation[]
+  transactions      Transaction[]
 
   @@map("users")
 }
@@ -46,4 +48,21 @@ model Theme {
   updatedAt   DateTime  @updatedAt @map("updated_at") @db.Timestamptz(6)
 
   @@map("themes")
+}
+
+model Transaction {
+  id            String    @id @default(uuid()) @db.Uuid
+  userId        String    @map("user_id") @db.Uuid
+  user          User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  provider      String    // "abacatepay" ou "stripe"
+  transactionId String    @unique @map("transaction_id") // ID externo
+  type          String    // "credits" (pacote) ou "subscription" (mensal)
+  planName      String    @map("plan_name") // "essential", "pro"
+  amount        Int       // valor em centavos
+  credits       Int       // quantidade de créditos adicionados
+  status        String    // "pending", "paid", "failed"
+  paidAt        DateTime? @map("paid_at") @db.Timestamptz(6)
+  createdAt     DateTime  @default(now()) @map("created_at") @db.Timestamptz(6)
+
+  @@map("transactions")
 }
