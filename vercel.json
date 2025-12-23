@@ -1,0 +1,10 @@
+{
+  "redirects": [
+    {
+      "source": "/",
+      "destination": "/petfest/app",
+      "permanent": false
+    }
+  ]
+}
+
