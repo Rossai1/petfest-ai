@@ -6,6 +6,7 @@ import { useUser } from '@clerk/nextjs';
 import { useState, useEffect } from 'react';
 import { getPackageData } from '@/lib/data/packages';
 import { QRCodeSVG } from 'qrcode.react';
+import { getApiUrl } from '@/lib/config/api';
 
 function CheckoutContent() {
   const searchParams = useSearchParams();
@@ -52,11 +53,20 @@ function CheckoutContent() {
     setError(null);
     
     try {
-      const response = await fetch('/api/abacate/create-billing', {
+      // #region agent log
+      const apiUrl = getApiUrl('/api/abacate/create-billing');
+      fetch('http://127.0.0.1:7243/ingest/647110f7-315d-4dcf-9dc7-3ded3b6781fc',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'checkout/page.js:55',message:'Calling API',data:{apiUrl,plan,type,origin:window.location.origin,pathname:window.location.pathname},timestamp:Date.now(),sessionId:'debug-session',hypothesisId:'C',runId:'initial'})}).catch(()=>{});
+      // #endregion
+      
+      const response = await fetch(getApiUrl('/api/abacate/create-billing'), {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ plan, type }),
       });
+      
+      // #region agent log
+      fetch('http://127.0.0.1:7243/ingest/647110f7-315d-4dcf-9dc7-3ded3b6781fc',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'checkout/page.js:62',message:'API Response',data:{status:response.status,ok:response.ok,url:response.url},timestamp:Date.now(),sessionId:'debug-session',hypothesisId:'A',runId:'initial'})}).catch(()=>{});
+      // #endregion
       
       const data = await response.json();
       
@@ -84,7 +94,17 @@ function CheckoutContent() {
   const startPaymentPolling = (id) => {
     const interval = setInterval(async () => {
       try {
-        const response = await fetch(`/api/abacate/billing-status?id=${id}`);
+        // #region agent log
+        const statusUrl = getApiUrl(`/api/abacate/billing-status?id=${id}`);
+        fetch('http://127.0.0.1:7243/ingest/647110f7-315d-4dcf-9dc7-3ded3b6781fc',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'checkout/page.js:90',message:'Polling status',data:{statusUrl,billingId:id},timestamp:Date.now(),sessionId:'debug-session',hypothesisId:'C',runId:'initial'})}).catch(()=>{});
+        // #endregion
+        
+        const response = await fetch(getApiUrl(`/api/abacate/billing-status?id=${id}`));
+        
+        // #region agent log
+        fetch('http://127.0.0.1:7243/ingest/647110f7-315d-4dcf-9dc7-3ded3b6781fc',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'checkout/page.js:95',message:'Status response',data:{status:response.status,ok:response.ok},timestamp:Date.now(),sessionId:'debug-session',hypothesisId:'A',runId:'initial'})}).catch(()=>{});
+        // #endregion
+        
         const data = await response.json();
         
         if (data.status === 'PAID') {

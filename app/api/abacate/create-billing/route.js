@@ -5,8 +5,18 @@ import { getPackageData } from '@/lib/data/packages';
 import { prisma } from '@/lib/database/db';
 
 export async function POST(request) {
+  // #region agent log
+  const fs = require('fs');
+  fs.appendFileSync('/Users/wesleyrossa/Documents/projetos-pessoais/Ross AI/pet-fast-ai/.cursor/debug.log', JSON.stringify({location:'api/abacate/create-billing/route.js:7',message:'API route hit',data:{url:request.url,method:request.method},timestamp:Date.now(),sessionId:'debug-session',hypothesisId:'B',runId:'initial'})+'\n');
+  // #endregion
+  
   try {
     const { userId: clerkUserId } = await auth();
+    
+    // #region agent log
+    fs.appendFileSync('/Users/wesleyrossa/Documents/projetos-pessoais/Ross AI/pet-fast-ai/.cursor/debug.log', JSON.stringify({location:'api/abacate/create-billing/route.js:12',message:'Auth result',data:{authenticated:!!clerkUserId},timestamp:Date.now(),sessionId:'debug-session',hypothesisId:'B',runId:'initial'})+'\n');
+    // #endregion
+    
     if (!clerkUserId) {
       return NextResponse.json(
         { error: 'Não autenticado' },
