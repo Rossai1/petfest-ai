@@ -246,11 +246,11 @@
   background: linear-gradient(135deg, rgba(197, 227, 132, 0.1) 0%, var(--card) 100%) !important;
 }
 
-/* Primary Button - Lime accent, pill-shaped */
+/* Primary Button - Lime accent, pill-shaped - Mobile Optimized */
 .btn-primary {
   background: var(--accent) !important;
   color: var(--foreground) !important;
-  padding: 16px 32px !important;
+  padding: 12px 24px !important;
   font-size: 0.875rem !important;
   font-weight: 700 !important;
   text-transform: uppercase !important;
@@ -259,6 +259,14 @@
   border: none !important;
   box-shadow: var(--shadow-md);
   transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  min-height: 44px !important; /* Touch target minimum */
+  touch-action: manipulation; /* Prevent double-tap zoom */
+}
+
+@media (min-width: 640px) {
+  .btn-primary {
+    padding: 16px 32px !important;
+  }
 }
 
 .btn-primary:hover:not(:disabled) {
@@ -276,7 +284,7 @@
   cursor: not-allowed;
 }
 
-/* Secondary Button - Charcoal, pill-shaped */
+/* Secondary Button - Charcoal, pill-shaped - Mobile Optimized */
 .btn-secondary {
   background: var(--foreground) !important;
   color: white !important;
@@ -285,6 +293,8 @@
   border-radius: var(--radius-button) !important;
   border: none !important;
   transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  min-height: 44px !important; /* Touch target minimum */
+  touch-action: manipulation; /* Prevent double-tap zoom */
 }
 
 .btn-secondary:hover:not(:disabled) {
@@ -617,6 +627,57 @@
 }
 
 /* Plans Page Palette (Teal) */
+
+/* =========================================
+   MOBILE RESPONSIVE IMPROVEMENTS
+   ========================================= */
+
+/* Touch target improvements */
+.touch-manipulation {
+  touch-action: manipulation;
+  -webkit-tap-highlight-color: transparent;
+}
+
+/* Prevent text size adjustment on iOS */
+@media screen and (max-width: 767px) {
+  html {
+    -webkit-text-size-adjust: 100%;
+    text-size-adjust: 100%;
+  }
+  
+  /* Improve tap targets on mobile */
+  button,
+  a,
+  [role="button"],
+  input[type="submit"],
+  input[type="button"] {
+    min-height: 44px;
+    min-width: 44px;
+  }
+  
+  /* Better spacing on mobile */
+  .organic-card {
+    padding: 1rem !important;
+  }
+  
+  @media (min-width: 640px) {
+    .organic-card {
+      padding: 1.5rem !important;
+    }
+  }
+}
+
+/* Improve scrolling on mobile */
+@media (max-width: 767px) {
+  body {
+    -webkit-overflow-scrolling: touch;
+  }
+  
+  /* Better modal spacing on mobile */
+  [role="dialog"] {
+    padding: 0.5rem;
+  }
+}
 
 /* Glass Card Effect */
 .glass-card {

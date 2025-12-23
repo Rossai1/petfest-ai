@@ -30,19 +30,20 @@ export const metadata = {
     shortcut: '/favicon.svg',
     apple: '/favicon.svg',
   },
-  viewport: {
-    width: 'device-width',
-    initialScale: 1,
-    maximumScale: 5,
-    userScalable: true,
-    viewportFit: 'cover',
-  },
-  themeColor: '#7FB5B5',
   appleWebApp: {
     capable: true,
     statusBarStyle: 'default',
     title: 'PetFest',
   },
+};
+
+export const viewport = {
+  width: 'device-width',
+  initialScale: 1,
+  maximumScale: 5,
+  userScalable: true,
+  viewportFit: 'cover',
+  themeColor: '#7FB5B5',
 };
 
 export default function RootLayout({ children }) {

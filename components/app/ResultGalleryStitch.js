@@ -1,7 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-import { Download, X, Loader2, Library, Share2 } from 'lucide-react';
+import { Download, X, Loader2, Library, Share2, DownloadCloud } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import Image from 'next/image';
 import { toast } from 'sonner';
@@ -51,6 +51,88 @@ export default function ResultGalleryStitch({ results, isLoading }) {
     }
   };
 
+  const downloadAllImages = async () => {
+    try {
+      const successfulResults = results.filter(r => r.success && r.url);
+      
+      if (successfulResults.length === 0) {
+        toast.error('Nenhuma imagem disponível para download');
+        return;
+      }
+
+      const toastId = 'download-all';
+      toast.loading(`Baixando ${successfulResults.length} imagem(ns)...`, { id: toastId });
+
+      // Importar JSZip dinamicamente
+      const JSZip = (await import('jszip')).default;
+      
+      // Criar instância do JSZip
+      const zip = new JSZip();
+
+      // Baixar todas as imagens e adicionar ao ZIP
+      let loadedCount = 0;
+      const downloadPromises = successfulResults.map(async (result, index) => {
+        try {
+          const response = await fetch(result.url);
+          if (!response.ok) {
+            throw new Error(`Erro ao baixar imagem ${index + 1}: ${response.statusText}`);
+          }
+          const blob = await response.blob();
+          
+          // Adicionar imagem ao ZIP com nome único
+          zip.file(`petfest-${index + 1}.png`, blob);
+          loadedCount++;
+          
+          // Atualizar progresso
+          if (loadedCount % Math.max(1, Math.floor(successfulResults.length / 3)) === 0) {
+            toast.loading(`Processando... ${loadedCount}/${successfulResults.length}`, { id: toastId });
+          }
+        } catch (error) {
+          logger.error(`Erro ao baixar imagem ${index + 1}:`, error);
+          // Continuar mesmo se uma imagem falhar
+        }
+      });
+
+      await Promise.all(downloadPromises);
+
+      // Verificar se pelo menos uma imagem foi adicionada
+      if (zip.files && Object.keys(zip.files).length === 0) {
+        toast.error('Nenhuma imagem pôde ser baixada', { id: toastId });
+        return;
+      }
+
+      // Gerar o arquivo ZIP
+      toast.loading(`Gerando arquivo ZIP...`, { id: toastId });
+      
+      const zipBlob = await zip.generateAsync({ 
+        type: 'blob',
+        compression: 'DEFLATE',
+        compressionOptions: { level: 6 }
+      });
+
+      // Criar link de download para o ZIP
+      const blobUrl = window.URL.createObjectURL(zipBlob);
+      const link = document.createElement('a');
+      const dateStr = new Date().toISOString().split('T')[0];
+      link.href = blobUrl;
+      link.download = `petfest-imagens-${dateStr}.zip`;
+      link.style.display = 'none';
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      
+      // Limpar URL após um delay para garantir que o download iniciou
+      setTimeout(() => {
+        window.URL.revokeObjectURL(blobUrl);
+      }, 100);
+      
+      toast.success(`ZIP com ${Object.keys(zip.files).length} imagem(ns) baixado com sucesso!`, { id: toastId });
+    } catch (error) {
+      logger.error('Erro ao criar ZIP:', error);
+      toast.error('Erro ao criar arquivo ZIP. Tente novamente.', { id: 'download-all' });
+    }
+  };
+
   if (isLoading) {
     return (
       <div className="bg-[#fdfbf7] dark:bg-gray-800 rounded-[2.5rem] p-10 flex flex-col items-center justify-center py-12 space-y-4 shadow-xl border border-white/20 dark:border-gray-700">
@@ -69,20 +151,33 @@ export default function ResultGalleryStitch({ results, isLoading }) {
 
   return (
     <>
-      <section className="w-full bg-[#fdfbf7] dark:bg-gray-800 rounded-[2.5rem] p-6 md:p-10 shadow-2xl mt-8 border border-white/20 dark:border-gray-700">
-        <div className="flex justify-between items-center mb-8">
-          <div className="flex items-center gap-3">
-            <div className="bg-[#79aca9]/20 p-2.5 rounded-full text-[#79aca9] dark:text-green-300">
-              <Library className="h-6 w-6" />
+      <section className="w-full bg-[#fdfbf7] dark:bg-gray-800 rounded-2xl sm:rounded-3xl md:rounded-[2.5rem] p-4 sm:p-6 md:p-10 shadow-2xl mt-6 sm:mt-8 border border-white/20 dark:border-gray-700" aria-label="Galeria de resultados">
+        <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 sm:gap-0 mb-6 sm:mb-8">
+          <div className="flex items-center gap-2 sm:gap-3">
+            <div className="bg-[#79aca9]/20 p-2 sm:p-2.5 rounded-full text-[#79aca9] dark:text-green-300">
+              <Library className="h-5 w-5 sm:h-6 sm:w-6" aria-hidden="true" />
             </div>
-            <h2 className="font-display font-bold text-3xl text-gray-800 dark:text-white">Resultados</h2>
+            <h2 className="font-display font-bold text-xl sm:text-2xl md:text-3xl text-gray-800 dark:text-white">Resultados</h2>
           </div>
-          <span className="bg-[#d4e6b5] dark:bg-green-900 text-[#4a6b2f] dark:text-green-200 px-4 py-1.5 rounded-full text-sm font-bold tracking-wide uppercase">
-            {results.length} {results.length === 1 ? 'Imagem' : 'Imagens'}
-          </span>
+          <div className="flex items-center gap-2 sm:gap-3 flex-wrap">
+            <span className="bg-[#d4e6b5] dark:bg-green-900 text-[#4a6b2f] dark:text-green-200 px-3 sm:px-4 py-1 sm:py-1.5 rounded-full text-xs sm:text-sm font-bold tracking-wide uppercase">
+              {results.length} {results.length === 1 ? 'Imagem' : 'Imagens'}
+            </span>
+            {results.filter(r => r.success && r.url).length > 1 && (
+              <Button
+                onClick={downloadAllImages}
+                className="bg-[#79aca9] hover:bg-[#6b9a97] active:bg-[#5d8a87] text-white font-semibold py-2 sm:py-2.5 px-3 sm:px-4 rounded-full text-xs sm:text-sm min-h-[36px] sm:min-h-[44px] touch-manipulation flex items-center gap-1.5 sm:gap-2 shadow-md"
+                aria-label="Baixar todas as imagens"
+              >
+                <DownloadCloud className="h-3.5 w-3.5 sm:h-4 sm:w-4" aria-hidden="true" />
+                <span className="hidden sm:inline">Baixar Todas</span>
+                <span className="sm:hidden">Todas</span>
+              </Button>
+            )}
+          </div>
         </div>
         
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-5 md:gap-6">
           {results.map((result, index) => {
             return (
               <div 
@@ -114,46 +209,59 @@ export default function ResultGalleryStitch({ results, isLoading }) {
                             logger.error('Erro ao carregar imagem:', result.url);
                           }}
                         />
-                        <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-end p-4">
+                        <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-end p-3 sm:p-4">
                           <div className="flex gap-2 w-full justify-end">
                             <Button
                               size="icon"
                               variant="ghost"
-                              className="bg-white/90 p-2 rounded-full hover:bg-white text-gray-800 shadow-lg backdrop-blur-sm transform translate-y-4 group-hover:translate-y-0 transition-transform duration-300 delay-75 min-h-[44px] min-w-[44px]"
+                              className="bg-white/90 p-2 rounded-full hover:bg-white active:bg-white/80 text-gray-800 shadow-lg backdrop-blur-sm transform translate-y-4 group-hover:translate-y-0 transition-transform duration-300 delay-75 min-h-[44px] min-w-[44px] touch-manipulation"
                               onClick={(e) => {
                                 e.stopPropagation();
                                 downloadImage(result.url, index);
                               }}
                               aria-label="Baixar imagem"
                             >
-                              <Download className="h-5 w-5" />
+                              <Download className="h-5 w-5" aria-hidden="true" />
                             </Button>
                             <Button
                               size="icon"
                               variant="ghost"
-                              className="bg-white/90 p-2 rounded-full hover:bg-white text-gray-800 shadow-lg backdrop-blur-sm transform translate-y-4 group-hover:translate-y-0 transition-transform duration-300 delay-100 min-h-[44px] min-w-[44px]"
+                              className="bg-white/90 p-2 rounded-full hover:bg-white active:bg-white/80 text-gray-800 shadow-lg backdrop-blur-sm transform translate-y-4 group-hover:translate-y-0 transition-transform duration-300 delay-100 min-h-[44px] min-w-[44px] touch-manipulation"
                               onClick={(e) => {
                                 e.stopPropagation();
                                 shareImage(result.url);
                               }}
                               aria-label="Compartilhar imagem"
                             >
-                              <Share2 className="h-5 w-5" />
+                              <Share2 className="h-5 w-5" aria-hidden="true" />
                             </Button>
                           </div>
                         </div>
                         {/* Mobile: Always show buttons */}
-                        <div className="md:hidden absolute bottom-4 right-4 flex gap-2">
+                        <div className="md:hidden absolute bottom-3 right-3 flex gap-2">
                           <Button
                             size="icon"
                             variant="ghost"
-                            className="bg-white/90 p-2 rounded-full hover:bg-white text-gray-800 shadow-lg backdrop-blur-sm min-h-[44px] min-w-[44px]"
+                            className="bg-white/90 p-2 rounded-full hover:bg-white active:bg-white/80 text-gray-800 shadow-lg backdrop-blur-sm min-h-[44px] min-w-[44px] touch-manipulation"
                             onClick={(e) => {
                               e.stopPropagation();
                               downloadImage(result.url, index);
                             }}
+                            aria-label="Baixar imagem"
                           >
-                            <Download className="h-5 w-5" />
+                            <Download className="h-5 w-5" aria-hidden="true" />
+                          </Button>
+                          <Button
+                            size="icon"
+                            variant="ghost"
+                            className="bg-white/90 p-2 rounded-full hover:bg-white active:bg-white/80 text-gray-800 shadow-lg backdrop-blur-sm min-h-[44px] min-w-[44px] touch-manipulation"
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              shareImage(result.url);
+                            }}
+                            aria-label="Compartilhar imagem"
+                          >
+                            <Share2 className="h-5 w-5" aria-hidden="true" />
                           </Button>
                         </div>
                       </>
@@ -171,42 +279,47 @@ export default function ResultGalleryStitch({ results, isLoading }) {
         </div>
       </section>
 
-      {/* Modal para visualização ampliada */}
+      {/* Modal para visualização ampliada - Mobile Optimized */}
       {selectedImage && (
         <div
           className="fixed inset-0 z-50 flex items-center justify-center bg-black/95 sm:bg-black/80 p-2 sm:p-4 backdrop-blur-sm"
           onClick={() => setSelectedImage(null)}
+          role="dialog"
+          aria-modal="true"
+          aria-label="Visualização ampliada da imagem"
         >
-          <div className="relative max-w-4xl max-h-[95vh] sm:max-h-[90vh] w-full flex flex-col">
+          <div className="relative max-w-4xl max-h-[95vh] sm:max-h-[90vh] w-full flex flex-col" onClick={(e) => e.stopPropagation()}>
             <Button
               variant="ghost"
               size="icon"
-              className="absolute top-2 right-2 sm:top-4 sm:right-4 z-10 bg-white/90 hover:bg-white rounded-full h-11 w-11 sm:h-10 sm:w-10"
+              className="absolute top-2 right-2 sm:top-4 sm:right-4 z-10 bg-white/90 hover:bg-white active:bg-white/80 rounded-full h-11 w-11 sm:h-10 sm:w-10 touch-manipulation shadow-lg"
               onClick={() => setSelectedImage(null)}
               aria-label="Fechar visualização"
             >
-              <X className="h-5 w-5" />
+              <X className="h-5 w-5" aria-hidden="true" />
             </Button>
-            <div className="relative w-full flex-1 bg-gray-900 rounded-2xl overflow-hidden shadow-2xl min-h-0">
+            <div className="relative w-full flex-1 bg-gray-900 rounded-xl sm:rounded-2xl overflow-hidden shadow-2xl min-h-0">
               <Image
                 src={selectedImage}
-                alt="Visualização ampliada"
+                alt="Visualização ampliada da imagem gerada"
                 fill
                 unoptimized={selectedImage.includes('supabase.co')}
                 className="object-contain"
                 sizes="100vw"
+                priority
               />
             </div>
-            <div className="mt-4 sm:mt-6 flex justify-center gap-2 pb-2 sm:pb-0">
+            <div className="mt-3 sm:mt-4 md:mt-6 flex justify-center gap-2 pb-2 sm:pb-0">
               <Button
                 onClick={(e) => {
                   e.stopPropagation();
                   const index = results.findIndex(r => r.url === selectedImage);
                   downloadImage(selectedImage, index >= 0 ? index : 0);
                 }}
-                className="bg-[#a4cbb4] hover:bg-[#8eb89f] text-[#2d5c58] dark:text-white font-bold py-3 px-6 rounded-full min-h-[44px]"
+                className="bg-[#a4cbb4] hover:bg-[#8eb89f] active:bg-[#7fb08f] text-[#2d5c58] dark:text-white font-bold py-2.5 sm:py-3 px-5 sm:px-6 rounded-full min-h-[44px] text-sm sm:text-base touch-manipulation"
+                aria-label="Baixar imagem"
               >
-                <Download className="h-5 w-5 mr-2" />
+                <Download className="h-4 w-4 sm:h-5 sm:w-5 mr-2" aria-hidden="true" />
                 Baixar Imagem
               </Button>
             </div>

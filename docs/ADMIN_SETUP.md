@@ -62,3 +62,4 @@ O sistema verifica se o email do usuário logado (via Clerk) corresponde ao `ADM
 
 Após completar este checklist, avance para a Sprint 8: Testes Finais.
 
+

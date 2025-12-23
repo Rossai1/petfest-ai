@@ -1,45 +1,34 @@
 import { NextResponse } from 'next/server';
-import { auth } from '@clerk/nextjs/server';
-import { getUserByClerkId, getRecentGenerations, createUser } from '@/lib/database/supabase-db';
-import { currentUser } from '@clerk/nextjs/server';
-import { ADMIN_EMAIL } from '@/lib/config/config';
-import { logProductionError } from '@/lib/utils/logger';
+import { getOrCreateUser } from '@/lib/services/clerk';
+import { getRecentGenerations } from '@/lib/database/supabase-db';
+import { checkUsageLimit } from '@/lib/utils/usage';
+import { logger } from '@/lib/utils/logger';
 
 /**
- * API UNIFICADA - Retorna histórico de gerações
+ * API UNIFICADA - Retorna dados do usuário, incluindo gerações e créditos.
+ * Lida com a criação/vinculação de usuários e o reset de créditos para o plano free.
  */
 export async function GET() {
   try {
-    const { userId: clerkId } = await auth();
+    // 1. Obter ou criar usuário (lida com vinculação de contas n8n)
+    const userResult = await getOrCreateUser();
 
-    if (!clerkId) {
+    if (!userResult) {
       return NextResponse.json(
         { error: 'Não autenticado' },
         { status: 401 }
       );
     }
 
-    // Primeiro, buscar usuário existente (caso mais comum - muito rápido)
-    let user = await getUserByClerkId(clerkId);
+    // `userResult` pode conter { ...user, linkedCredits: true/false }
+    const { linkedCredits, ...user } = userResult;
 
-    // Se usuário não existe, criar (acontece só na primeira vez)
-    if (!user) {
-      const clerkUser = await currentUser();
-      const email = clerkUser?.emailAddresses[0]?.emailAddress;
-      
-      if (!email) {
-        return NextResponse.json({
-          results: [],
-        });
-      }
-      
-      const isAdmin = email === ADMIN_EMAIL;
-      user = await createUser(clerkId, email, isAdmin);
-    }
+    // 2. Verificar uso e resetar créditos do plano free, se aplicável
+    const usageCheck = await checkUsageLimit(user);
+    const { wasReset, user: currentUser } = usageCheck;
 
-    // Buscar gerações
-    const generations = await getRecentGenerations(user.id, 10);
-
+    // 3. Buscar gerações recentes
+    const generations = await getRecentGenerations(currentUser.id, 10);
     const results = generations.map((item) => ({
       success: true,
       url: item.generatedImageUrl,
@@ -47,13 +36,22 @@ export async function GET() {
       revisedPrompt: null,
     }));
 
+    // 4. Retornar dados consolidados
     return NextResponse.json({
       results,
+      credits: currentUser.credits,
+      plan: currentUser.plan,
+      linkedCredits: linkedCredits || false,
+      wasReset: wasReset || false,
     });
+    
   } catch (error) {
-    logProductionError(error, { route: '/api/user-data' });
+    logger.error('Erro em /api/user-data:', { 
+      errorMessage: error.message,
+      stack: error.stack 
+    });
     return NextResponse.json(
-      { error: error.message || 'Erro ao obter dados' },
+      { error: 'Erro interno ao obter dados do usuário.' },
       { status: 500 }
     );
   }

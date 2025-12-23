@@ -1,83 +1,94 @@
 'use client';
 
-import { createContext, useContext, useState, useEffect, useRef, useCallback } from 'react';
+import { createContext, useContext, useState, useEffect, useCallback } from 'react';
 import { useUser } from '@clerk/nextjs';
+import { getApiUrl } from '@/config/api';
+import { toast } from 'sonner';
 
 const UserDataContext = createContext(null);
 
-/**
- * Provider SIMPLIFICADO - Apenas histórico de resultados
- */
 export function UserDataProvider({ children }) {
   const { user, isLoaded } = useUser();
   
-  // Estados
+  // Estados para dados do usuário
   const [results, setResults] = useState([]);
+  const [credits, setCredits] = useState(0);
+  const [plan, setPlan] = useState('free');
   const [isLoading, setIsLoading] = useState(true);
-  
-  // Ref para evitar chamadas duplicadas
-  const hasFetchedRef = useRef(false);
-  const fetchingRef = useRef(false);
 
-  // Função única para carregar dados
-  const loadUserData = useCallback(async (force = false) => {
-    // Evitar chamadas duplicadas
-    if (fetchingRef.current && !force) return;
-    if (hasFetchedRef.current && !force) return;
+  // Função para carregar todos os dados do usuário a partir da API
+  const loadUserData = useCallback(async () => {
+    if (!isLoaded || !user) {
+      // Não tenta carregar se o Clerk não estiver pronto ou não houver usuário
+      if (isLoaded && !user) setIsLoading(false);
+      return;
+    }
     
-    fetchingRef.current = true;
     setIsLoading(true);
     
     try {
-      const response = await fetch('/api/user-data');
+      const response = await fetch(getApiUrl('/api/user-data'));
       
       if (response.ok) {
         const data = await response.json();
         
-        if (data.results) {
-          setResults(data.results);
+        setResults(data.results || []);
+        setCredits(data.credits !== null ? data.credits : 0);
+        setPlan(data.plan || 'free');
+
+        // Exibir toasts para eventos específicos
+        if (data.linkedCredits) {
+          toast.success('Assinatura e créditos vinculados com sucesso!');
         }
-        
-        hasFetchedRef.current = true;
+        if (data.wasReset) {
+          toast.info('Seus créditos gratuitos foram renovados!');
+        }
+      } else {
+        const errorData = await response.json();
+        toast.error(errorData.error || 'Não foi possível carregar os dados do usuário.');
       }
     } catch (error) {
-      console.error('Erro ao carregar dados:', error);
+      console.error('Erro ao carregar dados do usuário:', error);
+      toast.error('Ocorreu um erro de rede ao buscar seus dados.');
     } finally {
       setIsLoading(false);
-      fetchingRef.current = false;
     }
-  }, []);
+  }, [user, isLoaded]);
 
-  // Função para atualizar após geração
-  const refreshAfterGeneration = useCallback(async () => {
-    hasFetchedRef.current = false;
-    await loadUserData(true);
-  }, [loadUserData]);
-
-  // Carregar dados UMA VEZ quando usuário está disponível
+  // Carrega os dados quando o estado de autenticação do Clerk muda
   useEffect(() => {
-    if (isLoaded && user && !hasFetchedRef.current) {
-      loadUserData();
-    } else if (isLoaded && !user) {
-      // Limpar dados se deslogado
-      hasFetchedRef.current = false;
-      setResults([]);
-      setIsLoading(false);
+    if (isLoaded) {
+      if (user) {
+        loadUserData();
+      } else {
+        // Limpa os dados se o usuário fizer logout
+        setResults([]);
+        setCredits(0);
+        setPlan('free');
+        setIsLoading(false);
+      }
     }
   }, [isLoaded, user, loadUserData]);
 
+  /**
+   * Função para atualização otimista dos créditos na UI
+   * Ex: updateCreditsLocally(prev => prev - 1)
+   */
+  const updateCreditsLocally = useCallback((updater) => {
+    setCredits(updater);
+  }, []);
+
   const value = {
-    // Resultados
+    // Dados
     results,
-    resultsLoading: isLoading,
-    setResults,
+    credits,
+    plan,
+    isLoading,
     
     // Funções
-    refreshAfterGeneration,
-    loadUserData,
-    
-    // Estado geral
-    isLoading,
+    setResults,
+    updateCreditsLocally,
+    refreshUserData: loadUserData, // Para forçar a recarga de dados
   };
 
   return (
@@ -88,7 +99,7 @@ export function UserDataProvider({ children }) {
 }
 
 /**
- * Hook para acessar dados do usuário
+ * Hook para acessar o contexto de dados do usuário
  */
 export function useUserData() {
   const context = useContext(UserDataContext);
@@ -96,12 +107,4 @@ export function useUserData() {
     throw new Error('useUserData deve ser usado dentro de UserDataProvider');
   }
   return context;
-}
-
-/**
- * Hook simplificado para acessar apenas resultados
- */
-export function useResults() {
-  const { results, resultsLoading, setResults } = useUserData();
-  return { results, loading: resultsLoading, setResults };
 }

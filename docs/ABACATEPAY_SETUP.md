@@ -151,3 +151,4 @@ Adicione todas as variáveis de ambiente no painel da Vercel:
 - Documentação AbacatePay: https://docs.abacatepay.com
 - Suporte: suporte@abacatepay.com
 
+

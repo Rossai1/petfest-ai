@@ -180,3 +180,4 @@ Antes de considerar o deploy completo:
 **Status Atual:** 🟡 Deploy enviado, aguardando configuração de variáveis de ambiente na Vercel
 **Próxima Ação:** Configurar env vars na Vercel e atualizar webhook
 
+

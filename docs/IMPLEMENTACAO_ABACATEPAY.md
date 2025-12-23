@@ -234,3 +234,4 @@ Veja `ABACATEPAY_SETUP.md` para soluções de problemas comuns:
 **Data:** 23/12/2025
 **Próximo passo:** Configurar variáveis de ambiente e testar com credenciais reais do AbacatePay
 
+

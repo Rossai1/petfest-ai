@@ -3,6 +3,7 @@ import { auth } from '@clerk/nextjs/server';
 import { editImage } from '@/lib/services/openai';
 import { getOrCreateUser } from '@/lib/services/clerk';
 import { checkUsageLimit, recordImageGeneration } from '@/lib/utils/usage';
+import { deductCredits } from '@/lib/database/supabase-db';
 import { compressImageIfNeeded } from '@/lib/utils/image-compression';
 import { uploadImageToStorage } from '@/lib/services/storage';
 import { logger, logProductionError } from '@/lib/utils/logger';
@@ -12,9 +13,8 @@ export const maxDuration = 300; // 5 minutos para processar múltiplas imagens
 
 export async function POST(request) {
   try {
-    // Verificar autenticação
+    // 1. Verificar autenticação
     const { userId } = await auth();
-
     if (!userId) {
       return NextResponse.json(
         { error: 'Não autenticado. Por favor, faça login.' },
@@ -22,29 +22,8 @@ export async function POST(request) {
       );
     }
 
-    // Verificar se a API key está configurada
-    if (!process.env.OPENAI_API_KEY) {
-      return NextResponse.json(
-        { error: 'API key não configurada no servidor' },
-        { status: 500 }
-      );
-    }
-
     // Obter ou criar usuário no banco
-    let user;
-    try {
-      user = await getOrCreateUser();
-    } catch (dbError) {
-      logger.error('Erro ao acessar banco de dados:', dbError);
-      return NextResponse.json(
-        { 
-          error: 'Erro ao conectar com o banco de dados. Verifique a configuração do DATABASE_URL.',
-          details: process.env.NODE_ENV === 'development' ? dbError.message : undefined,
-        },
-        { status: 500 }
-      );
-    }
-
+    const user = await getOrCreateUser();
     if (!user) {
       return NextResponse.json(
         { error: 'Erro ao obter dados do usuário. Tente fazer login novamente.' },
@@ -52,99 +31,92 @@ export async function POST(request) {
       );
     }
 
+    // 2. Validar créditos do usuário ANTES de processar
     const formData = await request.formData();
     const themeId = formData.get('themeId');
     const files = formData.getAll('images');
+    const numImages = files.length;
 
+    const usageCheck = await checkUsageLimit(user);
+
+    if (!usageCheck.canGenerate) {
+      return NextResponse.json(
+        { error: 'Créditos insuficientes para gerar imagens.', code: 'NO_CREDITS', credits: 0 },
+        { status: 403 }
+      );
+    }
+
+    if (usageCheck.credits < numImages) {
+      return NextResponse.json(
+        {
+          error: `Você tem ${usageCheck.credits} crédito(s), mas está tentando gerar ${numImages} imagem(ns).`,
+          code: 'INSUFFICIENT_CREDITS',
+          credits: usageCheck.credits,
+        },
+        { status: 403 }
+      );
+    }
+    
+    // 3. Validar input do formulário
     if (!themeId) {
-      return NextResponse.json(
-        { error: 'Tema não especificado' },
-        { status: 400 }
-      );
+      return NextResponse.json({ error: 'Tema não especificado' }, { status: 400 });
+    }
+    if (numImages === 0) {
+      return NextResponse.json({ error: 'Nenhuma imagem foi enviada' }, { status: 400 });
+    }
+    if (numImages > 10) {
+      return NextResponse.json({ error: 'Máximo de 10 imagens permitidas' }, { status: 400 });
     }
 
-    if (!files || files.length === 0) {
-      return NextResponse.json(
-        { error: 'Nenhuma imagem foi enviada' },
-        { status: 400 }
-      );
-    }
-
-    if (files.length > 10) {
-      return NextResponse.json(
-        { error: 'Máximo de 10 imagens permitidas' },
-        { status: 400 }
-      );
-    }
-
-    // Uso ilimitado - não precisa verificar limites
-
-    // Processar cada imagem
+    // 4. Processar cada imagem em paralelo
     const results = await Promise.allSettled(
       files.map(async (file) => {
-        try {
-          // Converter File para Buffer
-          const arrayBuffer = await file.arrayBuffer();
-          let buffer = Buffer.from(arrayBuffer);
+        const arrayBuffer = await file.arrayBuffer();
+        let buffer = Buffer.from(arrayBuffer);
+        buffer = await compressImageIfNeeded(buffer);
+        const result = await editImage(buffer, themeId);
+        const permanentUrl = await uploadImageToStorage(result.url, user.id, themeId);
 
-          // Comprimir imagem se necessário (máximo 4MB)
-          buffer = await compressImageIfNeeded(buffer);
-
-          // Processar imagem com OpenAI
-          const result = await editImage(buffer, themeId);
-          
-          // Fazer upload da imagem para storage permanente (Supabase)
-          const permanentUrl = await uploadImageToStorage(
-            result.url,
-            user.id,
-            themeId
-          );
-
-          return {
-            success: true,
-            url: permanentUrl, // Usar URL permanente em vez da temporária
-            revisedPrompt: result.revisedPrompt,
-          };
-        } catch (error) {
-          logger.error('Erro ao processar imagem:', error);
-          return {
-            success: false,
-            error: error.message || 'Erro desconhecido ao processar imagem',
-          };
-        }
+        return {
+          success: true,
+          url: permanentUrl,
+          revisedPrompt: result.revisedPrompt,
+        };
       })
     );
 
-    // Formatar resultados
     const formattedResults = results.map((result) => {
       if (result.status === 'fulfilled') {
         return result.value;
-      } else {
-        return {
-          success: false,
-          error: result.reason?.message || 'Erro ao processar imagem',
-        };
       }
+      logger.error('Erro ao processar imagem individualmente:', result.reason);
+      return { success: false, error: result.reason?.message || 'Erro ao processar imagem' };
     });
 
-    // Filtrar apenas gerações bem-sucedidas
+    // 5. Deduzir créditos e registrar uso
     const successfulResults = formattedResults.filter(r => r.success);
     const successfulGenerations = successfulResults.length;
 
-    // Registrar uso apenas das imagens bem-sucedidas
     if (successfulGenerations > 0) {
-      // Preparar array de gerações para registro
-      const generationsToRecord = successfulResults.map((result) => ({
-        theme: themeId,
-        generatedImageUrl: result.url || '',
-        originalImageUrl: '', // Não armazenamos URL original por enquanto
-      }));
+      try {
+        await deductCredits(user.id, successfulGenerations);
+        
+        const generationsToRecord = successfulResults.map((result) => ({
+          theme: themeId,
+          generatedImageUrl: result.url || '',
+          originalImageUrl: '', // Não armazenamos URL original por enquanto
+        }));
 
-      await recordImageGeneration(
-        user.id, 
-        user.clerkId,
-        generationsToRecord
-      );
+        await recordImageGeneration(user.id, user.clerkId, generationsToRecord);
+      } catch (error) {
+        // Se a dedução/registro falhar, a geração já ocorreu.
+        // Apenas logamos o erro para análise e não falhamos a requisição.
+        logProductionError(error, { 
+          message: 'Falha ao deduzir créditos ou registrar geração',
+          userId: user.id,
+          creditsToDeduct: successfulGenerations
+        });
+      }
     }
 
     return NextResponse.json({
@@ -153,13 +125,15 @@ export async function POST(request) {
     });
   } catch (error) {
     logProductionError(error, { route: '/api/edit' });
+    const isKnownError = error.code === 'NO_CREDITS' || error.code === 'INSUFFICIENT_CREDITS';
+
     return NextResponse.json(
       {
         error: error.message || 'Erro interno do servidor',
+        code: isKnownError ? error.code : 'INTERNAL_SERVER_ERROR',
         details: process.env.NODE_ENV === 'development' ? error.stack : undefined,
       },
-      { status: 500 }
+      { status: isKnownError ? 403 : 500 }
     );
   }
 }
-

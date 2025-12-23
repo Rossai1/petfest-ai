@@ -9,6 +9,7 @@ import Link from 'next/link';
 import { useSearchParams } from 'next/navigation';
 import Image from 'next/image';
 import { themes } from '@/lib/data/themes-data';
+import { getApiUrl } from '@/config/api';
 import { toast } from 'sonner';
 
 function DashboardContent() {
@@ -28,7 +29,7 @@ function DashboardContent() {
 
   const fetchUsage = async () => {
     try {
-      const response = await fetch('/api/recent-results?limit=50');
+      const response = await fetch(getApiUrl('/api/recent-results?limit=50'));
       if (response.ok) {
         const data = await response.json();
         setHistory(data.results || []);

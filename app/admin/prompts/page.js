@@ -7,6 +7,7 @@ import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Loader2, Save, Copy, Check } from 'lucide-react';
 import { themes } from '@/lib/data/themes-data';
+import { getApiUrl } from '@/config/api';
 import Link from 'next/link';
 
 export default function AdminPromptsPage() {
@@ -29,7 +30,7 @@ export default function AdminPromptsPage() {
   const checkAdminAndLoadPrompts = async () => {
     try {
       // Verificar se é admin
-      const response = await fetch('/api/admin/prompts');
+      const response = await fetch(getApiUrl('/api/admin/prompts'));
       if (response.status === 403) {
         // Não é admin, redirecionar
         router.push('/');
@@ -62,7 +63,7 @@ export default function AdminPromptsPage() {
     setSuccess(false);
 
     try {
-      const response = await fetch('/api/admin/prompts', {
+      const response = await fetch(getApiUrl('/api/admin/prompts'), {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

@@ -98,3 +98,4 @@ Após completar este checklist:
 1. Confirme que a Sprint 4 está completa
 2. Avance para Sprint 5: Implementar Fluxo de Assinatura Stripe
 
+

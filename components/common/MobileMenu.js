@@ -9,6 +9,7 @@ import { useUserData } from '@/contexts/UserDataContext';
 
 export default function MobileMenu({ isOpen, onClose }) {
   const { user } = useUser();
+  const { credits } = useUserData();
   const [isAdmin, setIsAdmin] = useState(false);
 
   useEffect(() => {
@@ -84,6 +85,11 @@ export default function MobileMenu({ isOpen, onClose }) {
                       {user?.emailAddresses[0]?.emailAddress}
                     </p>
                   </div>
+                </div>
+                <div className="flex items-center justify-center gap-2 bg-secondary rounded-full px-4 py-2">
+                  <Sparkles className="h-5 w-5 text-primary" />
+                  <span className="font-bold text-lg text-primary">{credits}</span>
+                  <span className="text-sm text-muted-foreground">créditos restantes</span>
                 </div>
               </div>
 

@@ -15,12 +15,13 @@ if (!ADMIN_EMAIL && process.env.NODE_ENV === 'production' && process.env.NEXT_PH
 /**
  * Configurações de créditos
  */
-export const CREDITS = {
-  ADMIN: 999999,
-  FREE_USER: 3,
-  ESSENTIAL_PLAN: 500,
-  PRO_PLAN: 2000,
+export const PLAN_CREDITS = {
+  FREE: 3,
+  ESSENTIAL: 50,
+  PRO: 180,
 };
+
+export const FREE_RESET_DAYS = 30;
 
 /**
  * Planos de assinatura

@@ -3,6 +3,7 @@
 import { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { X, Send, Loader2, MessageSquare } from 'lucide-react';
+import { getApiUrl } from '@/config/api';
 
 export default function SuggestionModal({ isOpen, onClose }) {
   const [suggestion, setSuggestion] = useState('');
@@ -24,7 +25,7 @@ export default function SuggestionModal({ isOpen, onClose }) {
     setError(null);
 
     try {
-      const response = await fetch('/api/suggestions', {
+      const response = await fetch(getApiUrl('/api/suggestions'), {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
