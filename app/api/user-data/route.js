@@ -23,8 +23,26 @@ export async function GET() {
     // `userResult` pode conter { ...user, linkedCredits: true/false }
     const { linkedCredits, ...user } = userResult;
 
+    // Validar que o usuário tem os campos necessários
+    if (!user || !user.id) {
+      logger.error('Usuário inválido retornado de getOrCreateUser:', user);
+      return NextResponse.json(
+        { error: 'Erro ao obter dados do usuário' },
+        { status: 500 }
+      );
+    }
+
     // 2. Verificar uso e resetar créditos do plano free, se aplicável
     const usageCheck = await checkUsageLimit(user);
+    
+    if (!usageCheck || !usageCheck.user) {
+      logger.error('checkUsageLimit retornou resultado inválido:', usageCheck);
+      return NextResponse.json(
+        { error: 'Erro ao verificar créditos do usuário' },
+        { status: 500 }
+      );
+    }
+    
     const { wasReset, user: currentUser } = usageCheck;
 
     // 3. Buscar gerações recentes
@@ -39,8 +57,8 @@ export async function GET() {
     // 4. Retornar dados consolidados
     return NextResponse.json({
       results,
-      credits: currentUser.credits,
-      plan: currentUser.plan,
+      credits: currentUser.credits ?? 0,
+      plan: currentUser.plan ?? 'free',
       linkedCredits: linkedCredits || false,
       wasReset: wasReset || false,
     });
@@ -48,10 +66,16 @@ export async function GET() {
   } catch (error) {
     logger.error('Erro em /api/user-data:', { 
       errorMessage: error.message,
-      stack: error.stack 
+      stack: error.stack,
+      errorName: error.name
     });
+    
+    // Retornar JSON mesmo em caso de erro para evitar HTML
     return NextResponse.json(
-      { error: 'Erro interno ao obter dados do usuário.' },
+      { 
+        error: 'Erro interno ao obter dados do usuário.',
+        details: process.env.NODE_ENV === 'development' ? error.message : undefined
+      },
       { status: 500 }
     );
   }

@@ -98,13 +98,15 @@ Use um `HTTP Request`:
 ```json
 [
   {
-    "email": "{{$json.email}}",
+    "email": "{{$json.email.toLowerCase().trim()}}",
     "credits": "{{$json.new_credits}}",
     "plan": "{{$json.plan}}"
   }
 ]
 ```
 
+> **IMPORTANTE:** Normalize o email para lowercase e trim antes de inserir/atualizar. Use uma função JavaScript no n8n para garantir: `{{$json.email.toLowerCase().trim()}}` ou crie um node Function que normalize o email. Isso garante consistência com o Clerk que também normaliza emails.
+>
 > Nao envie `clerk_id` para evitar sobrescrever usuarios ja vinculados.
 
 ## Observacoes
