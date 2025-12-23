@@ -84,10 +84,10 @@ return [{
 }];
 ```
 
-### 8) Upsert no Supabase
+### 8) Upsert no Supabase (kiwify_webhooks)
 Use um `HTTP Request`:
 - Metodo: `POST`
-- URL: `{{$env.SUPABASE_URL}}/rest/v1/users?on_conflict=email`
+- URL: `{{$env.SUPABASE_URL}}/rest/v1/kiwify_webhooks?on_conflict=email`
 - Headers:
   - `apikey: {{$env.SUPABASE_SERVICE_ROLE_KEY}}`
   - `Authorization: Bearer {{$env.SUPABASE_SERVICE_ROLE_KEY}}`
@@ -100,14 +100,20 @@ Use um `HTTP Request`:
   {
     "email": "{{$json.email.toLowerCase().trim()}}",
     "credits": "{{$json.new_credits}}",
-    "plan": "{{$json.plan}}"
+    "plan": "{{$json.plan}}",
+    "event_type": "order_approved",
+    "order_id": "{{$json.order_id}}",
+    "raw_data": {{$json.raw_data}}
   }
 ]
 ```
 
-> **IMPORTANTE:** Normalize o email para lowercase e trim antes de inserir/atualizar. Use uma função JavaScript no n8n para garantir: `{{$json.email.toLowerCase().trim()}}` ou crie um node Function que normalize o email. Isso garante consistência com o Clerk que também normaliza emails.
->
-> Nao envie `clerk_id` para evitar sobrescrever usuarios ja vinculados.
+> **IMPORTANTE:** 
+> - Normalize o email para lowercase e trim antes de inserir/atualizar: `{{$json.email.toLowerCase().trim()}}`
+> - A tabela `kiwify_webhooks` é agora a fonte única de verdade para usuários
+> - NÃO envie `clerk_id` para evitar sobrescrever usuários já vinculados ao Clerk
+> - O `event_type` deve ser "order_approved" para compras aprovadas
+> - O `order_id` e `raw_data` devem ser incluídos para auditoria
 
 ## Observacoes
 - Para atualizacao atomica, considere criar uma RPC `add_credits_by_email` no Supabase e chamar via `/rest/v1/rpc/add_credits_by_email`.
