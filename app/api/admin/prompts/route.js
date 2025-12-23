@@ -1,7 +1,7 @@
 import { NextResponse } from 'next/server';
 import { auth, currentUser } from '@clerk/nextjs/server';
 import { isAdmin } from '@/lib/services/clerk';
-import { prisma } from '@/lib/database/db';
+import { getSupabase } from '@/lib/database/supabase-db';
 import { themes } from '@/lib/data/themes-data';
 import { logger, logProductionError } from '@/lib/utils/logger';
 
@@ -24,14 +24,23 @@ export async function GET() {
       );
     }
 
-    // Buscar prompts do banco de dados
-    const themesFromDb = await prisma.theme.findMany();
+    // Buscar prompts do banco de dados (Supabase)
+    const supabase = getSupabase();
+    const { data: themesFromDb, error: fetchError } = await supabase
+      .from('themes')
+      .select('slug, prompt');
+    
+    if (fetchError) {
+      logger.error('Erro ao buscar temas do banco:', fetchError);
+    }
     
     // Criar objeto com prompts do banco
     const promptsFromDb = {};
-    themesFromDb.forEach((theme) => {
-      promptsFromDb[theme.slug] = theme.prompt;
-    });
+    if (themesFromDb) {
+      themesFromDb.forEach((theme) => {
+        promptsFromDb[theme.slug] = theme.prompt;
+      });
+    }
 
     // Mesclar com prompts padrão (fallback)
     const currentPrompts = {};
@@ -92,39 +101,56 @@ export async function POST(request) {
       }
     }
 
-    // Salvar/atualizar prompts no banco de dados
+    // Salvar/atualizar prompts no banco de dados (Supabase)
+    const supabase = getSupabase();
     const savedThemes = [];
     
     for (const [slug, prompt] of Object.entries(prompts)) {
       const themeData = themes[slug];
       
       // Verificar se o tema já existe no banco
-      const existingTheme = await prisma.theme.findUnique({
-        where: { slug },
-      });
+      const { data: existingTheme } = await supabase
+        .from('themes')
+        .select('id, slug')
+        .eq('slug', slug)
+        .single();
 
       if (existingTheme) {
         // Atualizar tema existente
-        const updated = await prisma.theme.update({
-          where: { slug },
-          data: {
+        const { data: updated, error: updateError } = await supabase
+          .from('themes')
+          .update({
             prompt: prompt,
             name: themeData.name,
-            updatedAt: new Date(),
-          },
-        });
-        savedThemes.push(updated);
+            updated_at: new Date().toISOString(),
+          })
+          .eq('slug', slug)
+          .select()
+          .single();
+        
+        if (updateError) {
+          logger.error(`Erro ao atualizar tema ${slug}:`, updateError);
+        } else if (updated) {
+          savedThemes.push(updated);
+        }
       } else {
         // Criar novo tema
-        const created = await prisma.theme.create({
-          data: {
+        const { data: created, error: createError } = await supabase
+          .from('themes')
+          .insert({
             slug: slug,
             name: themeData.name,
             prompt: prompt,
             description: themeData.name,
-          },
-        });
-        savedThemes.push(created);
+          })
+          .select()
+          .single();
+        
+        if (createError) {
+          logger.error(`Erro ao criar tema ${slug}:`, createError);
+        } else if (created) {
+          savedThemes.push(created);
+        }
       }
     }
 

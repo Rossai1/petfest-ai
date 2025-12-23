@@ -113,6 +113,18 @@ export default function AdminPromptsPage() {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-background to-muted/20">
+      {/* Header simples */}
+      <nav className="w-full px-6 py-4 border-b border-border/40 bg-background/95 backdrop-blur">
+        <div className="container mx-auto max-w-6xl flex items-center justify-between">
+          <Link href="/app" className="flex items-center gap-2">
+            <span className="font-display font-bold text-xl">PetFest Admin</span>
+          </Link>
+          <Button asChild variant="outline" size="sm">
+            <Link href="/app">Voltar para App</Link>
+          </Button>
+        </div>
+      </nav>
+      
       <div className="container mx-auto px-4 py-8 max-w-6xl">
         {/* Header */}
         <div className="mb-8">
