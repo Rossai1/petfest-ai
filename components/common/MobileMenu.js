@@ -4,7 +4,6 @@ import { useState, useEffect } from 'react';
 import { X, Menu, User, Sparkles, CreditCard, LogOut } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { SignInButton, SignUpButton, SignedIn, SignedOut, UserButton, useUser } from '@clerk/nextjs';
-import CreditsPill from '@/components/app/CreditsPill';
 import Link from 'next/link';
 import { useUserData } from '@/contexts/UserDataContext';
 
@@ -86,7 +85,6 @@ export default function MobileMenu({ isOpen, onClose }) {
                     </p>
                   </div>
                 </div>
-                <CreditsPill />
               </div>
 
               {/* Menu Items */}
@@ -127,17 +125,6 @@ export default function MobileMenu({ isOpen, onClose }) {
                   </Link>
                 </Button>
 
-                <Button
-                  asChild
-                  variant="ghost"
-                  className="w-full justify-start h-12 rounded-[16px]"
-                  onClick={onClose}
-                >
-                  <Link href="/pricing">
-                    <CreditCard className="h-5 w-5 mr-3" />
-                    Planos e Preços
-                  </Link>
-                </Button>
 
                 {isAdmin && (
                   <Button

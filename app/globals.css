@@ -223,26 +223,6 @@
    ORGANIC COMPONENT STYLES
    ========================================= */
 
-/* Credits Pill - Organic badge style */
-.credits-pill {
-  display: inline-flex;
-  align-items: center;
-  gap: 0.5rem;
-  padding: 0.625rem 1.25rem;
-  background: var(--card);
-  border: 1px solid var(--border);
-  border-radius: var(--radius-button);
-  font-size: 0.875rem;
-  font-weight: 600;
-  color: var(--foreground);
-  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-  box-shadow: var(--shadow-sm);
-}
-
-.credits-pill:hover {
-  transform: translateY(-2px);
-  box-shadow: var(--shadow-md);
-}
 
 /* Upload Zone - Organic dropzone */
 .upload-zone {
@@ -637,14 +617,6 @@
 }
 
 /* Plans Page Palette (Teal) */
-.plans-palette {
-  --stitch-primary: #7fb5b5;
-  --stitch-bg: #7fb5b5;
-  --stitch-card: #fdfaf6;
-  --stitch-text: #2d3748;
-  --stitch-secondary: #5f8f8f;
-  --stitch-accent: #b8d8be;
-}
 
 /* Glass Card Effect */
 .glass-card {

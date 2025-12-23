@@ -3,7 +3,6 @@
 import { useEffect, useState, Suspense } from 'react';
 import { useUser } from '@clerk/nextjs';
 import { Button } from '@/components/ui/button';
-import UsageIndicator from '@/components/app/UsageIndicator';
 import Logo from '@/components/common/Logo';
 import { Loader2, Image as ImageIcon, Download, Calendar, Sparkles, X, ArrowLeft, PawPrint } from 'lucide-react';
 import Link from 'next/link';
@@ -29,14 +28,13 @@ function DashboardContent() {
 
   const fetchUsage = async () => {
     try {
-      const response = await fetch('/api/usage?includeHistory=true&historyLimit=50');
+      const response = await fetch('/api/recent-results?limit=50');
       if (response.ok) {
         const data = await response.json();
-        setUsage(data.usage);
-        setHistory(data.history || []);
+        setHistory(data.results || []);
       }
     } catch (error) {
-      console.error('Erro ao buscar uso:', error);
+      console.error('Erro ao buscar histórico:', error);
     } finally {
       setLoading(false);
     }
@@ -90,15 +88,6 @@ function DashboardContent() {
   return (
     <div className="min-h-screen bg-organic-gradient">
       <div className="container mx-auto px-4 sm:px-6 py-6 sm:py-8 max-w-7xl">
-        {/* Success Message */}
-        {success && (
-          <div className="organic-card !bg-accent/30 border border-accent mb-6 fade-in-up">
-            <p className="text-sm font-semibold text-primary flex items-center gap-2">
-              <Sparkles className="h-4 w-4" />
-              Assinatura ativada com sucesso! Seu plano foi atualizado.
-            </p>
-          </div>
-        )}
 
         {/* Header - Mobile Optimized */}
         <div className="mb-6 sm:mb-8 fade-in-up">
@@ -124,11 +113,6 @@ function DashboardContent() {
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 sm:gap-6">
           {/* Main Content */}
           <div className="lg:col-span-2 space-y-4 sm:space-y-6 order-2 lg:order-1">
-            {/* Usage Indicator */}
-            <div className="fade-in-up-delay-1">
-              <UsageIndicator />
-            </div>
-
             {/* History Gallery */}
             <div className="organic-card fade-in-up-delay-2">
               <div className="flex items-center justify-between mb-6">
@@ -242,34 +226,9 @@ function DashboardContent() {
                     Gerar Imagens
                   </Link>
                 </Button>
-                <Button asChild className="btn-outline w-full min-h-[44px]">
-                  <Link href="/pricing">Ver Planos</Link>
-                </Button>
               </div>
             </div>
 
-            {/* Plan Info */}
-            {usage && (
-              <div className="organic-card fade-in-up-delay-2">
-                <h3 className="font-bold text-foreground mb-4">Seu Plano</h3>
-                <div className="space-y-3">
-                  <div className="flex justify-between items-center text-sm">
-                    <span className="text-muted-foreground">Plano:</span>
-                    <span className="organic-tag">{usage.plan}</span>
-                  </div>
-                  <div className="flex justify-between items-center text-sm">
-                    <span className="text-muted-foreground">Limite:</span>
-                    <span className="font-semibold">{usage.imagesLimit}/mês</span>
-                  </div>
-                  <div className="flex justify-between items-center text-sm">
-                    <span className="text-muted-foreground">Restantes:</span>
-                    <span className="font-semibold text-primary">
-                      {usage.creditsRemaining} créditos
-                    </span>
-                  </div>
-                </div>
-              </div>
-            )}
           </div>
         </div>
 

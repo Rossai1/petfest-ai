@@ -6,15 +6,12 @@ import { useUser } from '@clerk/nextjs';
 const UserDataContext = createContext(null);
 
 /**
- * Provider SIMPLIFICADO - Uma única chamada para todos os dados
+ * Provider SIMPLIFICADO - Apenas histórico de resultados
  */
 export function UserDataProvider({ children }) {
   const { user, isLoaded } = useUser();
   
   // Estados
-  const [credits, setCredits] = useState(null);
-  const [imagesLimit, setImagesLimit] = useState(null);
-  const [plan, setPlan] = useState(null);
   const [results, setResults] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
   
@@ -22,7 +19,7 @@ export function UserDataProvider({ children }) {
   const hasFetchedRef = useRef(false);
   const fetchingRef = useRef(false);
 
-  // Função única para carregar TODOS os dados
+  // Função única para carregar dados
   const loadUserData = useCallback(async (force = false) => {
     // Evitar chamadas duplicadas
     if (fetchingRef.current && !force) return;
@@ -32,18 +29,10 @@ export function UserDataProvider({ children }) {
     setIsLoading(true);
     
     try {
-      // UMA ÚNICA CHAMADA para tudo
       const response = await fetch('/api/user-data');
       
       if (response.ok) {
         const data = await response.json();
-        
-        // Atualizar estados
-        if (data.credits) {
-          setCredits(data.credits.creditsRemaining);
-          setImagesLimit(data.credits.imagesLimit);
-          setPlan(data.credits.plan);
-        }
         
         if (data.results) {
           setResults(data.results);
@@ -65,11 +54,6 @@ export function UserDataProvider({ children }) {
     await loadUserData(true);
   }, [loadUserData]);
 
-  // Função para decrementar créditos localmente (otimismo)
-  const decrementCredits = useCallback((amount = 1) => {
-    setCredits((prev) => Math.max(0, (prev || 0) - amount));
-  }, []);
-
   // Carregar dados UMA VEZ quando usuário está disponível
   useEffect(() => {
     if (isLoaded && user && !hasFetchedRef.current) {
@@ -77,21 +61,12 @@ export function UserDataProvider({ children }) {
     } else if (isLoaded && !user) {
       // Limpar dados se deslogado
       hasFetchedRef.current = false;
-      setCredits(null);
-      setImagesLimit(null);
-      setPlan(null);
       setResults([]);
       setIsLoading(false);
     }
   }, [isLoaded, user, loadUserData]);
 
   const value = {
-    // Créditos
-    credits,
-    imagesLimit,
-    plan,
-    creditsLoading: isLoading,
-    
     // Resultados
     results,
     resultsLoading: isLoading,
@@ -99,7 +74,6 @@ export function UserDataProvider({ children }) {
     
     // Funções
     refreshAfterGeneration,
-    decrementCredits,
     loadUserData,
     
     // Estado geral
@@ -122,14 +96,6 @@ export function useUserData() {
     throw new Error('useUserData deve ser usado dentro de UserDataProvider');
   }
   return context;
-}
-
-/**
- * Hook simplificado para acessar apenas créditos
- */
-export function useCredits() {
-  const { credits, imagesLimit, plan, creditsLoading } = useUserData();
-  return { credits, imagesLimit, plan, loading: creditsLoading };
 }
 
 /**

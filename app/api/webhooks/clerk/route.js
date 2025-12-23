@@ -67,10 +67,6 @@ export async function POST(request) {
           data: {
             clerkId: id,
             email: email,
-            plan: 'FREE',
-            imagesUsed: 0,
-            imagesLimit: 3,
-            resetDate: new Date(),
           },
         });
 

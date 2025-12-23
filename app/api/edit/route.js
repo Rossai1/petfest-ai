@@ -77,37 +77,7 @@ export async function POST(request) {
       );
     }
 
-    // Verificar limites de uso
-    const usage = await checkUsageLimit(user.id);
-
-    if (!usage.canGenerate) {
-      return NextResponse.json(
-        {
-          error: 'Limite de créditos atingido. Faça upgrade do seu plano.',
-          limitReached: true,
-          creditsRemaining: usage.creditsRemaining,
-          imagesLimit: usage.imagesLimit,
-          plan: usage.plan,
-        },
-        { status: 403 }
-      );
-    }
-
-    // Verificar se o usuário tem créditos suficientes
-    const imagesToGenerate = files.length;
-
-    if (imagesToGenerate > usage.creditsRemaining) {
-      return NextResponse.json(
-        {
-          error: `Você tem apenas ${usage.creditsRemaining} crédito(s) restante(s)`,
-          limitReached: true,
-          creditsRemaining: usage.creditsRemaining,
-          imagesLimit: usage.imagesLimit,
-          plan: usage.plan,
-        },
-        { status: 403 }
-      );
-    }
+    // Uso ilimitado - não precisa verificar limites
 
     // Processar cada imagem
     const results = await Promise.allSettled(
@@ -121,7 +91,7 @@ export async function POST(request) {
           buffer = await compressImageIfNeeded(buffer);
 
           // Processar imagem com OpenAI
-          const result = await editImage(buffer, themeId, user.planType);
+          const result = await editImage(buffer, themeId);
           
           // Fazer upload da imagem para storage permanente (Supabase)
           const permanentUrl = await uploadImageToStorage(
@@ -180,11 +150,6 @@ export async function POST(request) {
     return NextResponse.json({
       success: true,
       results: formattedResults,
-      usage: {
-        creditsRemaining: usage.creditsRemaining - successfulGenerations,
-        imagesLimit: usage.imagesLimit,
-        plan: usage.plan,
-      },
     });
   } catch (error) {
     logProductionError(error, { route: '/api/edit' });

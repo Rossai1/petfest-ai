@@ -4,6 +4,7 @@ import { ClerkProvider } from '@clerk/nextjs';
 import { Providers } from '@/components/common/Providers';
 import { Toaster } from 'sonner';
 import ErrorBoundary from '@/components/common/ErrorBoundary';
+import Header from '@/components/common/Header';
 import "./globals.css";
 
 const geistSans = Geist({
@@ -58,6 +59,7 @@ export default function RootLayout({ children }) {
         >
           <ErrorBoundary>
             <Providers>
+              <Header />
               {children}
             </Providers>
           </ErrorBoundary>

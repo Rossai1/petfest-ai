@@ -2,13 +2,11 @@ import { NextResponse } from 'next/server';
 import { auth } from '@clerk/nextjs/server';
 import { getUserByClerkId, getRecentGenerations, createUser } from '@/lib/database/supabase-db';
 import { currentUser } from '@clerk/nextjs/server';
-import { getPlanLimits } from '@/lib/data/pricing';
 import { ADMIN_EMAIL } from '@/lib/config/config';
 import { logProductionError } from '@/lib/utils/logger';
 
 /**
- * API UNIFICADA OTIMIZADA - Retorna créditos E histórico em uma única chamada
- * Evita chamadas desnecessárias ao Clerk (só chama currentUser se precisar criar usuário)
+ * API UNIFICADA - Retorna histórico de gerações
  */
 export async function GET() {
   try {
@@ -31,7 +29,6 @@ export async function GET() {
       
       if (!email) {
         return NextResponse.json({
-          credits: { creditsRemaining: 3, imagesLimit: 3, plan: 'free' },
           results: [],
         });
       }
@@ -40,7 +37,7 @@ export async function GET() {
       user = await createUser(clerkId, email, isAdmin);
     }
 
-    // Buscar gerações em paralelo (não depende de currentUser)
+    // Buscar gerações
     const generations = await getRecentGenerations(user.id, 10);
 
     const results = generations.map((item) => ({
@@ -50,14 +47,7 @@ export async function GET() {
       revisedPrompt: null,
     }));
 
-    const imagesLimit = getPlanLimits(user.planType);
-
     return NextResponse.json({
-      credits: {
-        creditsRemaining: user.creditsRemaining,
-        imagesLimit,
-        plan: user.planType,
-      },
       results,
     });
   } catch (error) {

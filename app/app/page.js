@@ -6,7 +6,6 @@ import { SignInButton, SignUpButton, SignedIn, SignedOut, UserButton, useUser } 
 import { Button } from '@/components/ui/button';
 import ImageUploaderStitch from '@/components/app/ImageUploaderStitch';
 import ThemeSelectorStitch from '@/components/app/ThemeSelectorStitch';
-import CreditsPill from '@/components/app/CreditsPill';
 import Logo from '@/components/common/Logo';
 import MobileMenu from '@/components/common/MobileMenu';
 import Link from 'next/link';
@@ -39,9 +38,7 @@ export default function AppPage() {
     results, 
     setResults, 
     resultsLoading, 
-    refreshAfterGeneration,
-    decrementCredits,
-    addResult 
+    refreshAfterGeneration
   } = useUserData();
   
   const [files, setFiles] = useState([]);
@@ -89,22 +86,13 @@ export default function AppPage() {
       const data = await response.json();
 
       if (!response.ok) {
-        if (data.limitReached) {
-          setError(
-            `Limite atingido! Você usou ${data.imagesUsed} de ${data.imagesLimit} imagens do plano ${data.plan}. Faça upgrade para continuar.`
-          );
-        } else {
-          setError(data.error || 'Erro ao processar imagens');
-        }
+        setError(data.error || 'Erro ao processar imagens');
         return;
       }
 
       if (data.success && data.results) {
-        // Atualizar resultados imediatamente (otimismo)
+        // Atualizar resultados imediatamente
         setResults(data.results);
-        
-        // Decrementar créditos localmente (otimismo)
-        decrementCredits(data.results.filter(r => r.success).length);
         
         // Atualizar dados do servidor em background
         setTimeout(() => {
@@ -141,12 +129,6 @@ export default function AppPage() {
             
         {/* Desktop Navigation */}
         <div className="flex items-center gap-6">
-          <SignedIn>
-            <div className="bg-[#fdfbf7] dark:bg-gray-800 px-4 py-2 rounded-full shadow-sm flex items-center gap-2 text-sm font-semibold text-gray-700 dark:text-gray-200">
-              <Sparkles className="h-5 w-5 text-[#79aca9]" />
-              <CreditsPill />
-            </div>
-          </SignedIn>
           <div className="hidden md:flex items-center gap-6 font-medium text-white dark:text-gray-300">
             <Button
               variant="ghost"
@@ -155,9 +137,6 @@ export default function AppPage() {
             >
               Sugestões
             </Button>
-            <Link href="/pricing" className="hover:text-white transition-colors text-white">
-              Planos
-            </Link>
           </div>
           <SignedIn>
             {isAdmin && (
@@ -178,9 +157,6 @@ export default function AppPage() {
 
         {/* Mobile Navigation */}
         <div className="flex md:hidden items-center gap-2">
-          <SignedIn>
-            <CreditsPill />
-          </SignedIn>
           <Button
             variant="ghost"
             size="icon"
@@ -216,7 +192,7 @@ export default function AppPage() {
               </div>
               <h3 className="text-lg sm:text-xl font-semibold mb-2">Faça login para começar</h3>
               <p className="text-sm sm:text-base text-muted-foreground mb-4 sm:mb-6 px-2">
-                Crie uma conta gratuita e ganhe 3 imagens por mês!
+                Crie uma conta gratuita e comece a gerar imagens ilimitadas!
               </p>
               <div className="flex flex-col sm:flex-row gap-3 sm:gap-4 justify-center px-4">
                 <SignInButton mode="modal">
@@ -273,11 +249,6 @@ export default function AppPage() {
             {error && (
               <div className="organic-card bg-soft-pink/30 border border-terracotta/20 fade-in-up">
                 <p className="text-terracotta font-medium mb-2">{error}</p>
-                {error.includes('Limite atingido') && (
-                  <Button asChild size="sm" className="btn-primary mt-2">
-                    <Link href="/pricing">Ver Planos</Link>
-                  </Button>
-                )}
               </div>
             )}
 
