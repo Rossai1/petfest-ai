@@ -1,7 +1,8 @@
 import { NextResponse } from 'next/server';
 import { auth, currentUser } from '@clerk/nextjs/server';
-import { getOrCreateStripeCustomer, createCheckoutSession, STRIPE_PRICE_IDS } from '@/lib/stripe';
-import { getOrCreateUser } from '@/lib/clerk';
+import { getOrCreateStripeCustomer, createCheckoutSession, STRIPE_PRICE_IDS } from '@/lib/services/stripe';
+import { getOrCreateUser } from '@/lib/services/clerk';
+import { logProductionError } from '@/lib/utils/logger';
 
 export async function POST(request) {
   try {
@@ -48,7 +49,7 @@ export async function POST(request) {
     let stripeCustomerId = user.stripeCustomerId;
     
     if (!stripeCustomerId) {
-      const { prisma } = await import('@/lib/db');
+      const { prisma } = await import('@/lib/database/db');
       const customer = await getOrCreateStripeCustomer(email, clerkUserId);
       stripeCustomerId = customer.id;
 
@@ -76,7 +77,7 @@ export async function POST(request) {
       url: session.url,
     });
   } catch (error) {
-    console.error('Erro ao criar checkout:', error);
+    logProductionError(error, { route: '/api/checkout' });
     return NextResponse.json(
       {
         error: error.message || 'Erro ao criar sessão de checkout',

@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server';
 import { auth } from '@clerk/nextjs/server';
-import { getUserByClerkId, getRecentGenerations } from '@/lib/supabase-db';
+import { getUserByClerkId, getRecentGenerations } from '@/lib/database/supabase-db';
+import { logProductionError } from '@/lib/utils/logger';
 
 /**
  * API otimizada para buscar resultados recentes
@@ -44,7 +45,7 @@ export async function GET() {
       results,
     });
   } catch (error) {
-    console.error('Erro ao obter resultados recentes:', error);
+    logProductionError(error, { route: '/api/recent-results' });
     return NextResponse.json(
       {
         error: error.message || 'Erro ao obter resultados recentes',

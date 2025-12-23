@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server';
 import { auth } from '@clerk/nextjs/server';
-import { getOrCreateUser } from '@/lib/clerk';
+import { getOrCreateUser } from '@/lib/services/clerk';
+import { logger, logProductionError } from '@/lib/utils/logger';
 
 export async function POST(request) {
   try {
@@ -47,7 +48,7 @@ Enviado em: ${new Date().toLocaleString('pt-BR')}
     const mailtoLink = `mailto:master@rossai.com.br?subject=${encodeURIComponent(emailSubject)}&body=${encodeURIComponent(emailBody)}`;
 
     // Log da sugestão (para debug)
-    console.log('Nova sugestão recebida:', {
+    logger.log('Nova sugestão recebida:', {
       userId,
       userEmail,
       suggestion: suggestion.substring(0, 100) + '...',
@@ -60,7 +61,7 @@ Enviado em: ${new Date().toLocaleString('pt-BR')}
       message: 'Sugestão enviada com sucesso!',
     });
   } catch (error) {
-    console.error('Erro ao processar sugestão:', error);
+    logProductionError(error, { route: '/api/suggestions' });
     return NextResponse.json(
       {
         error: error.message || 'Erro ao enviar sugestão',

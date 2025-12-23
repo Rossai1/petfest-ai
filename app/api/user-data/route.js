@@ -1,10 +1,10 @@
 import { NextResponse } from 'next/server';
 import { auth } from '@clerk/nextjs/server';
-import { getUserByClerkId, getRecentGenerations, createUser } from '@/lib/supabase-db';
+import { getUserByClerkId, getRecentGenerations, createUser } from '@/lib/database/supabase-db';
 import { currentUser } from '@clerk/nextjs/server';
-import { getPlanLimits } from '@/lib/pricing';
-
-const ADMIN_EMAIL = 'wesleykrzyzanovski@gmail.com';
+import { getPlanLimits } from '@/lib/data/pricing';
+import { ADMIN_EMAIL } from '@/lib/config/config';
+import { logProductionError } from '@/lib/utils/logger';
 
 /**
  * API UNIFICADA OTIMIZADA - Retorna créditos E histórico em uma única chamada
@@ -61,7 +61,7 @@ export async function GET() {
       results,
     });
   } catch (error) {
-    console.error('Erro ao obter dados do usuário:', error);
+    logProductionError(error, { route: '/api/user-data' });
     return NextResponse.json(
       { error: error.message || 'Erro ao obter dados' },
       { status: 500 }

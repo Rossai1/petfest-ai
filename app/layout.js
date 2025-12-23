@@ -1,7 +1,9 @@
 import { Geist, Geist_Mono } from "next/font/google";
 import { Quicksand } from "next/font/google";
 import { ClerkProvider } from '@clerk/nextjs';
-import { Providers } from '@/components/Providers';
+import { Providers } from '@/components/common/Providers';
+import { Toaster } from 'sonner';
+import ErrorBoundary from '@/components/common/ErrorBoundary';
 import "./globals.css";
 
 const geistSans = Geist({
@@ -28,6 +30,19 @@ export const metadata = {
     shortcut: '/favicon.svg',
     apple: '/favicon.svg',
   },
+  viewport: {
+    width: 'device-width',
+    initialScale: 1,
+    maximumScale: 5,
+    userScalable: true,
+    viewportFit: 'cover',
+  },
+  themeColor: '#7FB5B5',
+  appleWebApp: {
+    capable: true,
+    statusBarStyle: 'default',
+    title: 'PetFest',
+  },
 };
 
 export default function RootLayout({ children }) {
@@ -41,9 +56,23 @@ export default function RootLayout({ children }) {
         <body
           className={`${geistSans.variable} ${geistMono.variable} ${quicksand.variable} antialiased`}
         >
-          <Providers>
-            {children}
-          </Providers>
+          <ErrorBoundary>
+            <Providers>
+              {children}
+            </Providers>
+          </ErrorBoundary>
+          <Toaster
+            position="top-center"
+            richColors
+            closeButton
+            toastOptions={{
+              style: {
+                borderRadius: '24px',
+                padding: '16px',
+                fontFamily: 'var(--font-quicksand)',
+              },
+            }}
+          />
         </body>
       </html>
     </ClerkProvider>

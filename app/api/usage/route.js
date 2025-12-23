@@ -1,8 +1,9 @@
 import { NextResponse } from 'next/server';
 import { auth } from '@clerk/nextjs/server';
-import { getOrCreateUserFast, getRecentGenerations } from '@/lib/supabase-db';
+import { getOrCreateUserFast, getRecentGenerations } from '@/lib/database/supabase-db';
 import { currentUser } from '@clerk/nextjs/server';
-import { getPlanLimits } from '@/lib/pricing';
+import { getPlanLimits } from '@/lib/data/pricing';
+import { logProductionError } from '@/lib/utils/logger';
 
 /**
  * API de uso otimizada com Supabase direto
@@ -62,7 +63,7 @@ export async function GET(request) {
 
     return NextResponse.json(response);
   } catch (error) {
-    console.error('Erro ao obter uso:', error);
+    logProductionError(error, { route: '/api/usage' });
     return NextResponse.json(
       {
         error: error.message || 'Erro ao obter uso',

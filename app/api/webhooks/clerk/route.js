@@ -1,7 +1,8 @@
 import { NextResponse } from 'next/server';
 import { Webhook } from 'svix';
 import { headers } from 'next/headers';
-import { prisma } from '@/lib/db';
+import { prisma } from '@/lib/database/db';
+import { logger, logProductionError } from '@/lib/utils/logger';
 
 const webhookSecret = process.env.CLERK_WEBHOOK_SECRET;
 
@@ -39,7 +40,7 @@ export async function POST(request) {
       'svix-signature': svixSignature,
     });
   } catch (err) {
-    console.error('Erro ao verificar webhook:', err);
+    logger.error('Erro ao verificar webhook:', err);
     return NextResponse.json(
       { error: 'Erro ao verificar webhook' },
       { status: 400 }
@@ -73,7 +74,7 @@ export async function POST(request) {
           },
         });
 
-        console.log(`Usuário criado: ${id} (${email})`);
+        logger.log(`Usuário criado: ${id} (${email})`);
         break;
       }
 
@@ -87,7 +88,7 @@ export async function POST(request) {
           });
         }
 
-        console.log(`Usuário atualizado: ${id}`);
+        logger.log(`Usuário atualizado: ${id}`);
         break;
       }
 
@@ -96,17 +97,17 @@ export async function POST(request) {
           where: { clerkId: id },
         });
 
-        console.log(`Usuário deletado: ${id}`);
+        logger.log(`Usuário deletado: ${id}`);
         break;
       }
 
       default:
-        console.log(`Evento não tratado: ${eventType}`);
+        logger.log(`Evento não tratado: ${eventType}`);
     }
 
     return NextResponse.json({ received: true });
   } catch (error) {
-    console.error('Erro ao processar webhook Clerk:', error);
+    logProductionError(error, { route: '/api/webhooks/clerk' });
     return NextResponse.json(
       { error: 'Erro ao processar webhook' },
       { status: 500 }

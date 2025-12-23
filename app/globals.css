@@ -148,9 +148,32 @@
   body {
     @apply bg-background text-foreground;
     font-family: var(--font-sans), 'Inter', 'DM Sans', sans-serif;
+    /* Safe area padding for devices with notch */
+    padding-top: var(--safe-area-inset-top, 0px);
+    padding-right: var(--safe-area-inset-right, 0px);
+    padding-bottom: var(--safe-area-inset-bottom, 0px);
+    padding-left: var(--safe-area-inset-left, 0px);
   }
   h1, h2, h3, h4, h5, h6 {
     font-family: var(--font-display), 'Quicksand', 'Nunito', sans-serif;
+  }
+  
+  /* Ensure all interactive elements meet touch target minimum */
+  button,
+  a,
+  input,
+  select,
+  textarea,
+  [role="button"] {
+    min-height: var(--touch-target-min);
+    min-width: var(--touch-target-min);
+  }
+  
+  /* Allow smaller icons/text but maintain touch area */
+  button[data-size="icon"],
+  button[data-size="icon-sm"] {
+    min-width: var(--touch-target-min);
+    min-height: var(--touch-target-min);
   }
 }
 
@@ -178,17 +201,6 @@
   to {
     opacity: 1;
     transform: scale(1);
-  }
-}
-
-@keyframes gentlePulse {
-  0%, 100% {
-    opacity: 1;
-    transform: scale(1);
-  }
-  50% {
-    opacity: 0.8;
-    transform: scale(1.02);
   }
 }
 
@@ -381,13 +393,22 @@
   background: var(--secondary);
 }
 
-/* Organic Input */
+/* Organic Input - Mobile Optimized */
 .organic-input {
   background: var(--secondary) !important;
   border: 1px solid transparent !important;
   border-radius: var(--radius-input) !important;
   padding: 14px 20px !important;
+  min-height: var(--touch-target-min) !important;
+  font-size: 16px !important; /* Prevents zoom on iOS */
   transition: all 0.3s ease;
+  touch-action: manipulation;
+}
+
+@media (min-width: 640px) {
+  .organic-input {
+    font-size: 14px !important;
+  }
 }
 
 .organic-input:focus {
@@ -395,14 +416,23 @@
   box-shadow: 0 0 0 3px rgba(90, 107, 74, 0.1) !important;
 }
 
-/* Organic Select Trigger */
+/* Organic Select Trigger - Mobile Optimized */
 .organic-select {
   background: var(--card) !important;
   border: 1px solid var(--border) !important;
   border-radius: var(--radius-input) !important;
   padding: 14px 20px !important;
+  min-height: var(--touch-target-min) !important;
+  font-size: 16px !important; /* Prevents zoom on iOS */
   box-shadow: var(--shadow-sm);
   transition: all 0.3s ease;
+  touch-action: manipulation;
+}
+
+@media (min-width: 640px) {
+  .organic-select {
+    font-size: 14px !important;
+  }
 }
 
 .organic-select:hover {
@@ -481,17 +511,163 @@
 }
 
 /* =========================================
-   LAYOUT UTILITIES
+   LAYOUT UTILITIES - Mobile-First
    ========================================= */
 
 .organic-container {
   max-width: 800px;
   margin: 0 auto;
-  padding: 0 24px;
+  padding: 0 var(--mobile-padding);
+}
+
+@media (min-width: 640px) {
+  .organic-container {
+    padding: 0 24px;
+  }
+}
+
+.organic-container.with-top-padding {
+  padding-top: 32px;
+}
+
+@media (min-width: 640px) {
+  .organic-container.with-top-padding {
+    padding-top: 48px;
+  }
 }
 
 .organic-section {
-  margin-bottom: 32px;
+  margin-bottom: var(--mobile-section-gap);
+}
+
+@media (min-width: 640px) {
+  .organic-section {
+    margin-bottom: 32px;
+  }
+}
+
+/* Mobile-specific utilities */
+.touch-manipulation {
+  touch-action: manipulation;
+  -webkit-tap-highlight-color: transparent;
+}
+
+/* Safe area utilities */
+.safe-top {
+  padding-top: var(--safe-area-inset-top, 0px);
+}
+
+.safe-bottom {
+  padding-bottom: var(--safe-area-inset-bottom, 0px);
+}
+
+.safe-left {
+  padding-left: var(--safe-area-inset-left, 0px);
+}
+
+.safe-right {
+  padding-right: var(--safe-area-inset-right, 0px);
+}
+
+/* Mobile spacing utilities */
+.mobile-padding {
+  padding: var(--mobile-padding);
+}
+
+.mobile-gap {
+  gap: var(--mobile-gap);
+}
+
+/* Performance optimizations for mobile */
+@media (max-width: 639px) {
+  /* Reduce motion for better performance */
+  @media (prefers-reduced-motion: no-preference) {
+    * {
+      animation-duration: 0.3s !important;
+      transition-duration: 0.3s !important;
+    }
+  }
+  
+  /* Optimize images */
+  img {
+    image-rendering: -webkit-optimize-contrast;
+    image-rendering: crisp-edges;
+  }
+}
+
+/* Carousel scrollbar hide */
+.scrollbar-hide {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
+.scrollbar-hide::-webkit-scrollbar {
+  display: none;
+}
+
+/* =========================================
+   STITCH DESIGNS - PALETAS POR PÁGINA
+   ========================================= */
+
+/* Landing Page Palette (Verde Menta) */
+.landing-palette {
+  --stitch-primary: #82C0A5;
+  --stitch-bg: #7DB6A8;
+  --stitch-card: #FFFBF6;
+  --stitch-text: #1A2E35;
+  --stitch-accent: #CDE8C3;
+  --stitch-btn-primary: #CDE8C3;
+  --stitch-btn-hover: #B5D9A8;
+}
+
+.landing-palette body {
+  background-color: #7DB6A8;
+  background-image: linear-gradient(135deg, #7DB6A8 0%, #68A699 100%);
+  min-height: 100vh;
+}
+
+/* App Page Palette (Teal Médio) */
+.app-palette {
+  --stitch-primary: #79aca9;
+  --stitch-bg: #7aaead;
+  --stitch-surface: #fdfbf7;
+  --stitch-text: #2c3e50;
+  --stitch-secondary: #a4cbb4;
+  --stitch-accent: #e8f5e9;
+}
+
+/* Plans Page Palette (Teal) */
+.plans-palette {
+  --stitch-primary: #7fb5b5;
+  --stitch-bg: #7fb5b5;
+  --stitch-card: #fdfaf6;
+  --stitch-text: #2d3748;
+  --stitch-secondary: #5f8f8f;
+  --stitch-accent: #b8d8be;
+}
+
+/* Glass Card Effect */
+.glass-card {
+  background: rgba(255, 251, 246, 0.95);
+  backdrop-filter: blur(10px);
+}
+
+.dark .glass-card {
+  background: rgba(31, 41, 55, 0.9);
+}
+
+/* Hero Text Shadow */
+.hero-text-shadow {
+  text-shadow: 0 2px 10px rgba(0,0,0,0.1);
+}
+
+/* Soft Shadow */
+.shadow-soft {
+  box-shadow: 0 10px 40px -10px rgba(0,0,0,0.08);
+}
+
+.shadow-glow {
+  box-shadow: 0 0 20px rgba(130, 192, 165, 0.3);
 }
 
 /* Gradient backgrounds */
@@ -509,20 +685,129 @@
 }
 
 /* =========================================
-   RESPONSIVE ADJUSTMENTS
+   MOBILE-FIRST RESPONSIVE ADJUSTMENTS
    ========================================= */
 
-@media (max-width: 640px) {
+/* Base styles are mobile-first (default) */
+/* Breakpoints: mobile (<640px), tablet (640px-1024px), desktop (>1024px) */
+
+/* Mobile Base Styles */
+:root {
+  /* Mobile-specific spacing */
+  --mobile-padding: 16px;
+  --mobile-gap: 12px;
+  --mobile-section-gap: 24px;
+  
+  /* Mobile typography */
+  --mobile-text-sm: 0.875rem;
+  --mobile-text-base: 1rem;
+  --mobile-text-lg: 1.125rem;
+  --mobile-text-xl: 1.25rem;
+  
+  /* Touch targets - minimum 44x44px */
+  --touch-target-min: 44px;
+}
+
+/* Safe area insets for devices with notch */
+@supports (padding: max(0px)) {
+  :root {
+    --safe-area-inset-top: env(safe-area-inset-top, 0px);
+    --safe-area-inset-right: env(safe-area-inset-right, 0px);
+    --safe-area-inset-bottom: env(safe-area-inset-bottom, 0px);
+    --safe-area-inset-left: env(safe-area-inset-left, 0px);
+  }
+}
+
+/* Mobile optimizations */
+@media (max-width: 639px) {
+  /* Reduce padding on mobile */
+  .organic-container {
+    padding: 0 var(--mobile-padding);
+  }
+  
+  .organic-container.with-top-padding {
+    padding-top: 32px;
+  }
+  
+  /* Upload zone mobile */
   .upload-zone {
     padding: 32px 20px !important;
+    min-height: 140px;
+  }
+  
+  /* Buttons mobile - ensure minimum touch target */
+  .btn-primary,
+  .btn-secondary,
+  .btn-outline {
+    min-height: var(--touch-target-min);
+    padding: 12px 24px !important;
   }
   
   .btn-generate {
     padding: 16px 32px !important;
     width: 100%;
+    min-height: var(--touch-target-min);
   }
   
+  /* Cards mobile */
+  .organic-card {
+    padding: 20px 16px;
+  }
+  
+  /* Typography mobile */
+  h1 {
+    font-size: 2rem;
+    line-height: 1.2;
+  }
+  
+  h2 {
+    font-size: 1.5rem;
+    line-height: 1.3;
+  }
+  
+  h3 {
+    font-size: 1.25rem;
+    line-height: 1.4;
+  }
+  
+  /* Reduce animation complexity on mobile for performance */
+  @media (prefers-reduced-motion: no-preference) {
+    .hover-lift:hover {
+      transform: translateY(-2px);
+    }
+    
+    .hover-scale:hover {
+      transform: scale(1.01);
+    }
+  }
+  
+  /* Disable hover effects on touch devices */
+  @media (hover: none) {
+    .hover-lift:hover,
+    .hover-scale:hover {
+      transform: none;
+    }
+  }
+}
+
+/* Tablet adjustments */
+@media (min-width: 640px) and (max-width: 1024px) {
   .organic-container {
-    padding: 0 20px;
+    padding: 0 32px;
+  }
+  
+  .organic-card {
+    padding: 24px 20px;
+  }
+}
+
+/* Desktop adjustments */
+@media (min-width: 1025px) {
+  .organic-container {
+    padding: 0 40px;
+  }
+  
+  .organic-card {
+    padding: 24px 28px;
   }
 }

@@ -3,13 +3,14 @@
 import { useEffect, useState, Suspense } from 'react';
 import { useUser } from '@clerk/nextjs';
 import { Button } from '@/components/ui/button';
-import UsageIndicator from '@/components/UsageIndicator';
-import Logo from '@/components/Logo';
+import UsageIndicator from '@/components/app/UsageIndicator';
+import Logo from '@/components/common/Logo';
 import { Loader2, Image as ImageIcon, Download, Calendar, Sparkles, X, ArrowLeft, PawPrint } from 'lucide-react';
 import Link from 'next/link';
 import { useSearchParams } from 'next/navigation';
 import Image from 'next/image';
-import { themes } from '@/lib/themes-data';
+import { themes } from '@/lib/data/themes-data';
+import { toast } from 'sonner';
 
 function DashboardContent() {
   const { isLoaded, user } = useUser();
@@ -79,15 +80,16 @@ function DashboardContent() {
       link.click();
       document.body.removeChild(link);
       window.URL.revokeObjectURL(blobUrl);
+      toast.success('Imagem baixada com sucesso!');
     } catch (error) {
       console.error('Erro ao baixar imagem:', error);
-      alert('Erro ao baixar a imagem. Tente novamente.');
+      toast.error('Erro ao baixar a imagem. Tente novamente.');
     }
   };
 
   return (
     <div className="min-h-screen bg-organic-gradient">
-      <div className="container mx-auto px-4 py-8 max-w-7xl">
+      <div className="container mx-auto px-4 sm:px-6 py-6 sm:py-8 max-w-7xl">
         {/* Success Message */}
         {success && (
           <div className="organic-card !bg-accent/30 border border-accent mb-6 fade-in-up">
@@ -98,28 +100,30 @@ function DashboardContent() {
           </div>
         )}
 
-        {/* Header */}
-        <div className="mb-8 fade-in-up">
-          <Button asChild variant="ghost" className="mb-4 rounded-full text-foreground/80 hover:text-foreground hover:bg-card/50">
+        {/* Header - Mobile Optimized */}
+        <div className="mb-6 sm:mb-8 fade-in-up">
+          <Button asChild variant="ghost" className="mb-3 sm:mb-4 rounded-full text-foreground/80 hover:text-foreground hover:bg-card/50 min-h-[44px] px-3 sm:px-4">
             <Link href="/">
               <ArrowLeft className="h-4 w-4 mr-2" />
-              Voltar para Home
+              <span className="hidden sm:inline">Voltar para Home</span>
+              <span className="sm:hidden">Voltar</span>
             </Link>
           </Button>
-          <div className="flex items-center gap-4">
-            <Logo size={56} />
-            <div>
-              <h1 className="text-3xl font-bold text-foreground">Olá, {user?.firstName || 'Pet Lover'}!</h1>
-              <p className="text-foreground/70">
+          <div className="flex items-center gap-3 sm:gap-4">
+            <Logo size={48} className="sm:hidden" />
+            <Logo size={56} className="hidden sm:block" />
+            <div className="min-w-0 flex-1">
+              <h1 className="text-2xl sm:text-3xl font-bold text-foreground truncate">Olá, {user?.firstName || 'Pet Lover'}!</h1>
+              <p className="text-sm sm:text-base text-foreground/70">
                 Bem-vindo ao seu painel de controle
               </p>
             </div>
           </div>
         </div>
 
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 sm:gap-6">
           {/* Main Content */}
-          <div className="lg:col-span-2 space-y-6">
+          <div className="lg:col-span-2 space-y-4 sm:space-y-6 order-2 lg:order-1">
             {/* Usage Indicator */}
             <div className="fade-in-up-delay-1">
               <UsageIndicator />
@@ -158,7 +162,7 @@ function DashboardContent() {
                   </Button>
                 </div>
               ) : (
-                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-4">
                   {history.map((item, index) => {
                     const themeInfo = getThemeInfo(item.theme);
                     
@@ -184,7 +188,8 @@ function DashboardContent() {
                                   e.target.style.display = 'none';
                                 }}
                               />
-                              <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-all duration-300 flex items-end justify-center pb-4">
+                              {/* Mobile: Always visible, Desktop: On hover */}
+                              <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent opacity-100 sm:opacity-0 sm:group-hover:opacity-100 transition-all duration-300 flex items-end justify-center pb-3 sm:pb-4">
                                 <div className="flex gap-2">
                                   <Button
                                     size="sm"
@@ -192,7 +197,7 @@ function DashboardContent() {
                                       e.stopPropagation();
                                       downloadImage(item.generatedImageUrl, themeInfo.name, index);
                                     }}
-                                    className="btn-primary !py-2 !px-4 !text-xs transform translate-y-2 group-hover:translate-y-0 transition-transform duration-300"
+                                    className="btn-primary !py-2 !px-4 !text-xs transform translate-y-0 sm:translate-y-2 sm:group-hover:translate-y-0 transition-transform duration-300 min-h-[36px]"
                                   >
                                     <Download className="h-3 w-3 mr-1" />
                                     Baixar
@@ -225,19 +230,19 @@ function DashboardContent() {
             </div>
           </div>
 
-          {/* Sidebar */}
-          <div className="space-y-6">
+          {/* Sidebar - Mobile First */}
+          <div className="space-y-4 sm:space-y-6 order-1 lg:order-2">
             {/* Quick Actions */}
             <div className="organic-card fade-in-up-delay-1">
               <h3 className="font-bold text-foreground mb-4">Ações Rápidas</h3>
               <div className="space-y-3">
-                <Button asChild className="btn-primary w-full">
+                <Button asChild className="btn-primary w-full min-h-[44px]">
                   <Link href="/">
                     <Sparkles className="h-4 w-4 mr-2" />
                     Gerar Imagens
                   </Link>
                 </Button>
-                <Button asChild className="btn-outline w-full">
+                <Button asChild className="btn-outline w-full min-h-[44px]">
                   <Link href="/pricing">Ver Planos</Link>
                 </Button>
               </div>
@@ -278,31 +283,33 @@ function DashboardContent() {
         </footer>
       </div>
 
-      {/* Modal para visualização ampliada */}
+      {/* Modal para visualização ampliada - Mobile Optimized */}
       {selectedImage && (
         <div
-          className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 p-4 backdrop-blur-sm"
+          className="fixed inset-0 z-50 flex items-center justify-center bg-black/95 sm:bg-black/80 p-2 sm:p-4 backdrop-blur-sm"
           onClick={() => setSelectedImage(null)}
         >
-          <div className="relative max-w-4xl max-h-[90vh] w-full fade-in-scale">
+          <div className="relative max-w-4xl max-h-[95vh] sm:max-h-[90vh] w-full fade-in-scale flex flex-col">
             <Button
               variant="ghost"
               size="icon"
-              className="absolute top-4 right-4 z-10 bg-card/90 hover:bg-card rounded-full h-10 w-10"
+              className="absolute top-2 right-2 sm:top-4 sm:right-4 z-10 bg-card/90 hover:bg-card rounded-full h-11 w-11 sm:h-10 sm:w-10 touch-manipulation"
               onClick={() => setSelectedImage(null)}
+              aria-label="Fechar visualização"
             >
               <X className="h-5 w-5" />
             </Button>
-            <div className="relative w-full aspect-square bg-secondary rounded-[32px] overflow-hidden shadow-2xl">
+            <div className="relative w-full flex-1 bg-secondary rounded-[24px] sm:rounded-[32px] overflow-hidden shadow-2xl min-h-0">
               <Image
                 src={selectedImage}
                 alt="Visualização ampliada"
                 fill
                 unoptimized={selectedImage.includes('supabase.co')}
                 className="object-contain"
+                sizes="100vw"
               />
             </div>
-            <div className="mt-6 flex justify-center">
+            <div className="mt-4 sm:mt-6 flex justify-center pb-2 sm:pb-0">
               <Button
                 onClick={(e) => {
                   e.stopPropagation();
@@ -313,7 +320,7 @@ function DashboardContent() {
                     downloadImage(selectedImage, themeInfo.name, index);
                   }
                 }}
-                className="btn-primary"
+                className="btn-primary w-full sm:w-auto min-h-[44px]"
               >
                 <Download className="h-5 w-5 mr-2" />
                 Baixar Imagem

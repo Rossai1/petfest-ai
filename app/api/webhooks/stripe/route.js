@@ -1,8 +1,9 @@
 import { NextResponse } from 'next/server';
 import { headers } from 'next/headers';
-import { stripe } from '@/lib/stripe';
-import { prisma } from '@/lib/db';
-import { getPlanLimits } from '@/lib/pricing';
+import { stripe } from '@/lib/services/stripe';
+import { prisma } from '@/lib/database/db';
+import { getPlanLimits } from '@/lib/data/pricing';
+import { logger, logProductionError } from '@/lib/utils/logger';
 
 const webhookSecret = process.env.STRIPE_WEBHOOK_SECRET;
 
@@ -23,7 +24,7 @@ export async function POST(request) {
   try {
     event = stripe.webhooks.constructEvent(body, signature, webhookSecret);
   } catch (err) {
-    console.error('Erro ao verificar webhook:', err.message);
+    logger.error('Erro ao verificar webhook:', err.message);
     return NextResponse.json(
       { error: `Webhook Error: ${err.message}` },
       { status: 400 }
@@ -60,7 +61,7 @@ export async function POST(request) {
           },
         });
 
-        console.log(`Assinatura ${event.type} - Cliente ${customerId} atualizado para plano ${planType} com ${newCredits} créditos`);
+        logger.log(`Assinatura ${event.type} - Cliente ${customerId} atualizado para plano ${planType} com ${newCredits} créditos`);
         break;
       }
 
@@ -77,30 +78,30 @@ export async function POST(request) {
           },
         });
 
-        console.log(`Assinatura cancelada - Cliente ${customerId} rebaixado para free`);
+        logger.log(`Assinatura cancelada - Cliente ${customerId} rebaixado para free`);
         break;
       }
 
       case 'invoice.payment_succeeded': {
         const invoice = event.data.object;
-        console.log(`Pagamento bem-sucedido para invoice ${invoice.id}`);
+        logger.log(`Pagamento bem-sucedido para invoice ${invoice.id}`);
         break;
       }
 
       case 'invoice.payment_failed': {
         const invoice = event.data.object;
-        console.log(`Pagamento falhou para invoice ${invoice.id}`);
+        logger.log(`Pagamento falhou para invoice ${invoice.id}`);
         // Aqui você pode implementar lógica para notificar o usuário
         break;
       }
 
       default:
-        console.log(`Evento não tratado: ${event.type}`);
+        logger.log(`Evento não tratado: ${event.type}`);
     }
 
     return NextResponse.json({ received: true });
   } catch (error) {
-    console.error('Erro ao processar webhook:', error);
+    logProductionError(error, { route: '/api/webhooks/stripe' });
     return NextResponse.json(
       { error: 'Erro ao processar webhook' },
       { status: 500 }

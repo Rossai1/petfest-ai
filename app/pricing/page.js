@@ -2,16 +2,21 @@
 
 import { useEffect, useState } from 'react';
 import { useUser } from '@clerk/nextjs';
-import PricingCard from '@/components/PricingCard';
+import PricingCardStitch from '@/components/features/PricingCardStitch';
+import PricingTabs from '@/components/features/PricingTabs';
+import FAQGrid from '@/components/features/FAQGrid';
 import { Button } from '@/components/ui/button';
-import Logo from '@/components/Logo';
-import { Sparkles, ArrowLeft, PawPrint } from 'lucide-react';
+import Logo from '@/components/common/Logo';
+import CreditsPill from '@/components/app/CreditsPill';
+import { SignedIn, UserButton } from '@clerk/nextjs';
+import { Sparkles, ArrowLeft, Menu } from 'lucide-react';
 import Link from 'next/link';
 
 export default function PricingPage() {
   const { isLoaded } = useUser();
   const [currentPlan, setCurrentPlan] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [activeTab, setActiveTab] = useState('packages');
 
   useEffect(() => {
     if (isLoaded) {
@@ -33,144 +38,121 @@ export default function PricingPage() {
     }
   };
 
+  // Ajustar planos conforme design Stitch (créditos únicos)
   const plans = [
     {
       plan: 'FREE',
-      price: 0,
-      limit: 3,
+      price: 19,
+      limit: 50,
       quality: 'Low',
       features: [
-        '3 imagens por mês',
+        '~25 Imagens Geradas',
         'Acesso a todos os temas',
-        'Qualidade Low',
-        'Suporte da comunidade',
+        'Qualidade Padrão',
+        'Upscaling 4K',
       ],
     },
     {
       plan: 'ESSENTIAL',
-      price: 29.90,
-      limit: 50,
+      price: 49,
+      limit: 200,
       quality: 'Medium',
       features: [
-        '50 imagens por mês',
-        'Acesso a todos os temas',
-        'Qualidade Medium',
-        'Prioridade no suporte',
-        'Reset mensal automático',
-        'Histórico de imagens',
+        '~100 Imagens Geradas',
+        'Acesso antecipado a temas novos',
+        'Alta Definição (HD)',
+        'Gerador de Stickers',
       ],
       isPopular: true,
     },
     {
       plan: 'PRO',
-      price: 79.90,
-      limit: 180,
+      price: 99,
+      limit: 500,
       quality: 'High',
       features: [
-        '180 imagens por mês',
-        'Acesso a todos os temas',
-        'Qualidade High',
-        'Suporte prioritário',
-        'Reset mensal automático',
-        'Histórico completo',
+        '~250 Imagens Geradas',
+        'Prioridade no processamento',
+        'Upscaling 4K',
+        'Licença Comercial',
       ],
     },
   ];
 
   return (
-    <div className="min-h-screen bg-organic-gradient">
-      <div className="container mx-auto px-4 py-8 max-w-6xl">
-        {/* Header com navegação */}
-        <div className="mb-8 fade-in-up">
-          <Button asChild variant="ghost" className="rounded-full text-foreground/80 hover:text-foreground hover:bg-card/50">
-            <Link href="/">
-              <ArrowLeft className="h-4 w-4 mr-2" />
-              Voltar para Home
-            </Link>
-          </Button>
-        </div>
-
-        {/* Hero */}
-        <div className="text-center mb-12 fade-in-up-delay-1">
-          <div className="inline-flex items-center justify-center mb-6">
-            <Logo size={64} />
+    <div className="min-h-screen plans-palette" style={{ backgroundColor: '#7fb5b5' }}>
+      {/* Header Stitch Style */}
+      <nav className="w-full px-6 py-4 flex items-center justify-between max-w-7xl mx-auto">
+        <Link href="/" className="flex items-center gap-2">
+          <div className="text-white">
+            <Logo size={32} />
           </div>
-          <h1 className="text-4xl md:text-5xl font-bold text-foreground mb-4">
-            Planos e Preços
+          <span className="text-xl font-bold text-gray-800 dark:text-white tracking-tight">PetFest</span>
+        </Link>
+        <div className="flex items-center gap-6">
+          <SignedIn>
+            <div className="hidden md:flex items-center gap-2 bg-[#fdfaf6] dark:bg-gray-800 px-4 py-2 rounded-full shadow-sm text-sm font-semibold">
+              <Sparkles className="h-4 w-4 text-[#7fb5b5]" />
+              <CreditsPill />
+            </div>
+          </SignedIn>
+          <div className="hidden md:flex items-center gap-6 text-sm font-medium text-gray-800 dark:text-gray-200">
+            <Link href="/app" className="hover:opacity-75 transition">Sugestões</Link>
+            <Link href="#" className="opacity-100 font-bold border-b-2 border-gray-800 dark:border-white pb-0.5">Planos</Link>
+          </div>
+          <SignedIn>
+            <UserButton afterSignOutUrl="/" />
+          </SignedIn>
+        </div>
+      </nav>
+
+      <main className="flex-grow flex flex-col items-center justify-center px-4 py-12 md:py-20 w-full max-w-7xl mx-auto">
+        {/* Hero */}
+        <div className="text-center mb-16 max-w-3xl">
+          <h1 className="text-4xl md:text-5xl font-extrabold text-gray-900 dark:text-white mb-6 leading-tight">
+            Escolha o plano perfeito para <br/>
+            <span className="text-[#5f8f8f] dark:text-teal-300">eternizar momentos festivos</span>
           </h1>
-          <p className="text-lg text-foreground/70 max-w-2xl mx-auto">
-            Escolha o plano ideal para suas necessidades. Todos os planos incluem acesso a todos os temas festivos.
+          <p className="text-lg md:text-xl text-gray-700 dark:text-gray-300 opacity-90">
+            Transforme seu pet em arte com nossos pacotes de créditos flexíveis. <br className="hidden md:block"/> Sem assinaturas mensais, pague apenas pelo que usar.
           </p>
+          <PricingTabs activeTab={activeTab} onTabChange={setActiveTab} />
         </div>
 
         {loading ? (
           <div className="flex justify-center py-12">
-            <div className="organic-card animate-pulse">
+            <div className="bg-[#fdfaf6] dark:bg-gray-800 rounded-3xl p-8 animate-pulse">
               <div className="flex items-center gap-3">
-                <div className="w-8 h-8 rounded-full bg-secondary" />
-                <div className="h-4 w-32 bg-secondary rounded-full" />
+                <div className="w-8 h-8 rounded-full bg-gray-200 dark:bg-gray-700" />
+                <div className="h-4 w-32 bg-gray-200 dark:bg-gray-700 rounded-full" />
               </div>
             </div>
           </div>
         ) : (
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 fade-in-up-delay-2">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-8 w-full max-w-6xl items-start">
             {plans.map((planData, index) => (
-              <div 
+              <PricingCardStitch
                 key={planData.plan}
-                style={{ '--delay': `${0.1 * (index + 1)}s` }}
-                className="fade-in-up"
-              >
-                <PricingCard
-                  plan={planData.plan}
-                  price={planData.price}
-                  limit={planData.limit}
-                  quality={planData.quality}
-                  features={planData.features}
-                  isPopular={planData.isPopular}
-                  currentPlan={currentPlan}
-                />
-              </div>
+                plan={planData.plan}
+                price={planData.price}
+                limit={planData.limit}
+                quality={planData.quality}
+                features={planData.features}
+                isPopular={planData.isPopular}
+                currentPlan={currentPlan}
+              />
             ))}
           </div>
         )}
 
-        {/* FAQ Section */}
-        <div className="organic-card mt-12 fade-in-up-delay-3">
-          <h2 className="text-2xl font-bold text-foreground mb-6 flex items-center gap-3">
-            <PawPrint className="h-6 w-6 text-primary" />
-            Perguntas Frequentes
-          </h2>
-          <div className="space-y-6">
-            <div className="pb-4 border-b border-border">
-              <p className="font-semibold text-foreground mb-2">Como funciona o reset mensal?</p>
-              <p className="text-muted-foreground">
-                Seu contador de imagens é resetado automaticamente todo mês, permitindo que você use novamente todas as imagens do seu plano.
-              </p>
-            </div>
-            <div className="pb-4 border-b border-border">
-              <p className="font-semibold text-foreground mb-2">Posso mudar de plano a qualquer momento?</p>
-              <p className="text-muted-foreground">
-                Sim! Você pode fazer upgrade ou downgrade a qualquer momento. As mudanças são aplicadas imediatamente.
-              </p>
-            </div>
-            <div>
-              <p className="font-semibold text-foreground mb-2">O que acontece se eu exceder o limite?</p>
-              <p className="text-muted-foreground">
-                Você receberá uma notificação quando estiver próximo do limite. Ao atingir o limite, você precisará fazer upgrade ou aguardar o reset mensal.
-              </p>
-            </div>
-          </div>
-        </div>
+        {/* FAQ Grid */}
+        <FAQGrid />
 
         {/* Footer */}
-        <footer className="mt-16 text-center text-sm text-foreground/60 fade-in-up-delay-4">
-          <p className="flex items-center justify-center gap-2">
-            <PawPrint className="h-4 w-4" />
-            Feito com amor para seus pets
-            <PawPrint className="h-4 w-4" />
-          </p>
+        <footer className="w-full py-8 text-center text-gray-800/60 dark:text-white/60 text-sm mt-12">
+          <p>© 2024 PetFest. Todos os direitos reservados.</p>
         </footer>
-      </div>
+      </main>
     </div>
   );
 }

@@ -1,10 +1,10 @@
 import { NextResponse } from 'next/server';
 import { auth } from '@clerk/nextjs/server';
-import { getUserByClerkId, createUser } from '@/lib/supabase-db';
+import { getUserByClerkId, createUser } from '@/lib/database/supabase-db';
 import { currentUser } from '@clerk/nextjs/server';
-import { getPlanLimits } from '@/lib/pricing';
-
-const ADMIN_EMAIL = 'wesleykrzyzanovski@gmail.com';
+import { getPlanLimits } from '@/lib/data/pricing';
+import { ADMIN_EMAIL } from '@/lib/config/config';
+import { logProductionError } from '@/lib/utils/logger';
 
 /**
  * API otimizada para retornar APENAS créditos do usuário
@@ -49,7 +49,7 @@ export async function GET() {
       plan: user.planType,
     });
   } catch (error) {
-    console.error('Erro ao obter créditos:', error);
+    logProductionError(error, { route: '/api/credits' });
     return NextResponse.json(
       { error: 'Erro ao obter créditos' },
       { status: 500 }

@@ -1,8 +1,9 @@
 import { NextResponse } from 'next/server';
 import { auth, currentUser } from '@clerk/nextjs/server';
-import { isAdmin } from '@/lib/clerk';
-import { prisma } from '@/lib/db';
-import { themes } from '@/lib/themes-data';
+import { isAdmin } from '@/lib/services/clerk';
+import { prisma } from '@/lib/database/db';
+import { themes } from '@/lib/data/themes-data';
+import { logger, logProductionError } from '@/lib/utils/logger';
 
 export async function GET() {
   try {
@@ -42,7 +43,7 @@ export async function GET() {
       prompts: currentPrompts,
     });
   } catch (error) {
-    console.error('Erro ao obter prompts:', error);
+    logProductionError(error, { route: '/api/admin/prompts GET' });
     return NextResponse.json(
       { error: error.message || 'Erro ao obter prompts' },
       { status: 500 }
@@ -127,7 +128,7 @@ export async function POST(request) {
       }
     }
 
-    console.log('Prompts salvos no banco:', {
+    logger.log('Prompts salvos no banco:', {
       userId,
       themes: savedThemes.map(t => t.slug),
       timestamp: new Date().toISOString(),
@@ -139,7 +140,7 @@ export async function POST(request) {
       saved: savedThemes.length,
     });
   } catch (error) {
-    console.error('Erro ao salvar prompts:', error);
+    logProductionError(error, { route: '/api/admin/prompts POST' });
     return NextResponse.json(
       { error: error.message || 'Erro ao salvar prompts' },
       { status: 500 }

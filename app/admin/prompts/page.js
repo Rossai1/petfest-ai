@@ -6,7 +6,7 @@ import { useRouter } from 'next/navigation';
 import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Loader2, Save, Copy, Check } from 'lucide-react';
-import { themes } from '@/lib/themes-data';
+import { themes } from '@/lib/data/themes-data';
 import Link from 'next/link';
 
 export default function AdminPromptsPage() {

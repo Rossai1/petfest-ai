@@ -1,10 +1,11 @@
 import { NextResponse } from 'next/server';
 import { auth } from '@clerk/nextjs/server';
-import { editImage } from '@/lib/openai';
-import { getOrCreateUser } from '@/lib/clerk';
-import { checkUsageLimit, recordImageGeneration } from '@/lib/usage';
-import { compressImageIfNeeded } from '@/lib/image-compression';
-import { uploadImageToStorage } from '@/lib/storage';
+import { editImage } from '@/lib/services/openai';
+import { getOrCreateUser } from '@/lib/services/clerk';
+import { checkUsageLimit, recordImageGeneration } from '@/lib/utils/usage';
+import { compressImageIfNeeded } from '@/lib/utils/image-compression';
+import { uploadImageToStorage } from '@/lib/services/storage';
+import { logger, logProductionError } from '@/lib/utils/logger';
 
 export const runtime = 'nodejs';
 export const maxDuration = 300; // 5 minutos para processar múltiplas imagens
@@ -34,7 +35,7 @@ export async function POST(request) {
     try {
       user = await getOrCreateUser();
     } catch (dbError) {
-      console.error('Erro ao acessar banco de dados:', dbError);
+      logger.error('Erro ao acessar banco de dados:', dbError);
       return NextResponse.json(
         { 
           error: 'Erro ao conectar com o banco de dados. Verifique a configuração do DATABASE_URL.',
@@ -135,7 +136,7 @@ export async function POST(request) {
             revisedPrompt: result.revisedPrompt,
           };
         } catch (error) {
-          console.error('Erro ao processar imagem:', error);
+          logger.error('Erro ao processar imagem:', error);
           return {
             success: false,
             error: error.message || 'Erro desconhecido ao processar imagem',
@@ -186,8 +187,7 @@ export async function POST(request) {
       },
     });
   } catch (error) {
-    console.error('Erro na API route:', error);
-    console.error('Stack trace:', error.stack);
+    logProductionError(error, { route: '/api/edit' });
     return NextResponse.json(
       {
         error: error.message || 'Erro interno do servidor',
