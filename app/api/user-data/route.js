@@ -46,8 +46,24 @@ export async function GET() {
     
     const { wasReset, user: currentUser } = usageCheck;
 
+    // Validar currentUser após checkUsageLimit
+    if (!currentUser || !currentUser.id) {
+      logger.error('currentUser inválido após checkUsageLimit:', currentUser);
+      return NextResponse.json(
+        { error: 'Erro ao obter dados do usuário após verificação de créditos' },
+        { status: 500 }
+      );
+    }
+
     // 3. Buscar gerações recentes
-    const generations = await getRecentGenerations(currentUser.id, 10);
+    let generations = [];
+    try {
+      generations = await getRecentGenerations(currentUser.id, 10);
+    } catch (genError) {
+      logger.error('Erro ao buscar gerações:', genError);
+      // Não falha a requisição se houver erro ao buscar gerações, apenas retorna array vazio
+      generations = [];
+    }
     const results = generations.map((item) => ({
       success: true,
       url: item.generatedImageUrl,
