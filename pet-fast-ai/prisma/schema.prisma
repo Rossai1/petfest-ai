@@ -1,0 +1,47 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+// Usando as tabelas existentes do Supabase
+model User {
+  id                String        @id @default(uuid()) @db.Uuid
+  clerkId           String        @unique @map("clerk_id")
+  email             String?
+  createdAt         DateTime      @default(now()) @map("created_at") @db.Timestamptz(6)
+  generations       Generation[]
+
+  @@map("users")
+}
+
+model Generation {
+  id                String   @id @default(uuid()) @db.Uuid
+  userId            String   @map("user_id") @db.Uuid
+  user              User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  clerkId           String   @map("clerk_id")
+  originalImageUrl  String   @map("original_image_url")
+  generatedImageUrl String   @map("generated_image_url")
+  theme             String
+  createdAt         DateTime @default(now()) @map("created_at") @db.Timestamptz(6)
+
+  @@map("generations")
+}
+
+model Theme {
+  id          String    @id @default(uuid()) @db.Uuid
+  name        String
+  slug        String    @unique
+  prompt      String    @db.Text
+  description String?   @db.Text
+  createdAt   DateTime  @default(now()) @map("created_at") @db.Timestamptz(6)
+  updatedAt   DateTime  @updatedAt @map("updated_at") @db.Timestamptz(6)
+
+  @@map("themes")
+}
+

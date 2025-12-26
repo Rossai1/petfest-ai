@@ -1,0 +1,227 @@
+<!DOCTYPE html>
+<html lang="pt-BR"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Planos - PetFest</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,typography"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/icon?family=Material+Icons+Round" rel="stylesheet"/>
+<script>
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        primary: "#7fb5b5", // The teal background color from the screenshot
+                        secondary: "#5f8f8f", // A darker shade for accents
+                        accent: "#b8d8be", // Light green for badges/buttons
+                        "background-light": "#fdfaf6", // The cream/off-white card background
+                        "background-dark": "#1f2937", // Standard dark mode background
+                        "text-primary": "#2d3748",
+                        "text-muted": "#6b7280",
+                    },
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                    },
+                    borderRadius: {
+                        DEFAULT: "1rem", // Rounded corners as seen in the screenshot cards
+                        'xl': '1.5rem',
+                        '2xl': '2rem',
+                    },
+                },
+            },
+        };
+    </script>
+</head>
+<body class="bg-primary min-h-screen font-sans antialiased text-gray-800 dark:bg-gray-900 selection:bg-accent selection:text-gray-900 flex flex-col">
+<nav class="w-full px-6 py-4 flex items-center justify-between max-w-7xl mx-auto">
+<div class="flex items-center gap-2">
+<div class="text-white">
+<span class="material-icons-round text-3xl">pets</span>
+</div>
+<span class="text-xl font-bold text-gray-800 dark:text-white tracking-tight">PetFest</span>
+</div>
+<div class="flex items-center gap-6">
+<button class="hidden md:flex items-center gap-2 bg-background-light dark:bg-gray-800 px-4 py-2 rounded-full shadow-sm text-sm font-semibold transition hover:shadow-md">
+<span class="material-icons-round text-base">auto_awesome</span>
+<span>999999 créditos</span>
+</button>
+<div class="hidden md:flex items-center gap-6 text-sm font-medium text-gray-800 dark:text-gray-200">
+<a class="hover:opacity-75 transition" href="#">Sugestões</a>
+<a class="opacity-100 font-bold border-b-2 border-gray-800 dark:border-white pb-0.5" href="#">Planos</a>
+<a class="hover:opacity-75 transition" href="#">
+<span class="material-icons-round text-xl align-middle">edit_note</span>
+</a>
+</div>
+<div class="h-10 w-10 rounded-full overflow-hidden border-2 border-white/50 cursor-pointer">
+<img alt="User Avatar" class="h-full w-full object-cover" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBR973Iz4msJLhd5BuVga8-rBKOnv_iCvP8udVuxMIj2MfWFXCYRzZjau7b0lUu8K65ZiDO_0JC3I9KuV_iatVtPQkbR5jp1VBTrvmjY-BijDM9ope8IPs7cu5WlnHFpPlNgswMer3lBAPWUGir0daA9WtS-g56kL09hNeY6ytPN4YT4J3VhBOUNbt4MUs-MEUJf4Op-bswcIkJKI3HeZpaLYMmbxU3SqhhCR8fv6ePvIT4wQxZKH9a2j-I54ccMPMPsie6VE9mu_k"/>
+</div>
+</div>
+</nav>
+<main class="flex-grow flex flex-col items-center justify-center px-4 py-12 md:py-20 w-full max-w-7xl mx-auto">
+<div class="text-center mb-16 max-w-3xl">
+<h1 class="text-4xl md:text-5xl font-extrabold text-gray-900 dark:text-white mb-6 leading-tight">
+                Escolha o plano perfeito para <br/>
+<span class="text-secondary dark:text-teal-300">eternizar momentos festivos</span>
+</h1>
+<p class="text-lg md:text-xl text-gray-700 dark:text-gray-300 opacity-90">
+                Transforme seu pet em arte com nossos pacotes de créditos flexíveis. <br class="hidden md:block"/> Sem assinaturas mensais, pague apenas pelo que usar.
+            </p>
+<div class="mt-8 inline-flex bg-background-light/30 dark:bg-gray-800/50 backdrop-blur-sm p-1 rounded-full border border-white/20">
+<button class="px-6 py-2 rounded-full bg-white dark:bg-gray-700 shadow-sm text-sm font-semibold text-gray-900 dark:text-white">Pacotes de Créditos</button>
+<button class="px-6 py-2 rounded-full text-sm font-medium text-gray-700 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white transition">Assinatura Mensal</button>
+</div>
+</div>
+<div class="grid grid-cols-1 md:grid-cols-3 gap-8 w-full max-w-6xl items-start">
+<div class="bg-background-light dark:bg-gray-800 rounded-3xl p-8 shadow-xl border-2 border-transparent hover:border-white/50 transition duration-300 transform hover:-translate-y-1 relative group">
+<div class="absolute top-0 left-0 w-full h-2 bg-gray-300 rounded-t-3xl"></div>
+<h3 class="text-xl font-bold text-gray-900 dark:text-white mb-2">Iniciante</h3>
+<p class="text-gray-500 dark:text-gray-400 text-sm mb-6">Para quem quer experimentar a magia.</p>
+<div class="flex items-baseline mb-6">
+<span class="text-4xl font-extrabold text-gray-900 dark:text-white">R$ 19</span>
+<span class="text-gray-500 dark:text-gray-400 ml-2">/ único</span>
+</div>
+<div class="bg-primary/10 dark:bg-primary/20 rounded-xl p-4 mb-8 flex items-center justify-center gap-2">
+<span class="material-icons-round text-secondary dark:text-teal-300">token</span>
+<span class="font-bold text-secondary dark:text-teal-300 text-lg">50 Créditos</span>
+</div>
+<ul class="space-y-4 mb-8 text-sm text-gray-600 dark:text-gray-300">
+<li class="flex items-center gap-3">
+<span class="material-icons-round text-green-500 text-lg">check_circle</span>
+                        ~25 Imagens Geradas
+                    </li>
+<li class="flex items-center gap-3">
+<span class="material-icons-round text-green-500 text-lg">check_circle</span>
+                        Acesso a todos os temas
+                    </li>
+<li class="flex items-center gap-3">
+<span class="material-icons-round text-green-500 text-lg">check_circle</span>
+                        Qualidade Padrão
+                    </li>
+<li class="flex items-center gap-3 opacity-50">
+<span class="material-icons-round text-gray-400 text-lg">cancel</span>
+                        Upscaling 4K
+                    </li>
+</ul>
+<button class="w-full py-3 px-6 rounded-xl border-2 border-gray-900 dark:border-gray-500 text-gray-900 dark:text-white font-bold hover:bg-gray-900 hover:text-white dark:hover:bg-white dark:hover:text-gray-900 transition-colors">
+                    Comprar Agora
+                </button>
+</div>
+<div class="bg-background-light dark:bg-gray-800 rounded-3xl p-8 shadow-2xl border-4 border-secondary/30 relative transform md:-translate-y-4 z-10">
+<div class="absolute -top-5 left-1/2 transform -translate-x-1/2 bg-secondary text-white px-4 py-1 rounded-full text-xs font-bold uppercase tracking-wider shadow-lg">
+                    Mais Popular
+                </div>
+<h3 class="text-xl font-bold text-gray-900 dark:text-white mb-2">Entusiasta</h3>
+<p class="text-gray-500 dark:text-gray-400 text-sm mb-6">O melhor valor para criadores de conteúdo.</p>
+<div class="flex items-baseline mb-6">
+<span class="text-4xl font-extrabold text-gray-900 dark:text-white">R$ 49</span>
+<span class="text-gray-500 dark:text-gray-400 ml-2">/ único</span>
+</div>
+<div class="bg-accent/40 dark:bg-accent/20 rounded-xl p-4 mb-8 flex items-center justify-center gap-2 border border-accent">
+<span class="material-icons-round text-green-800 dark:text-green-300">token</span>
+<span class="font-bold text-green-900 dark:text-green-300 text-lg">200 Créditos</span>
+</div>
+<ul class="space-y-4 mb-8 text-sm text-gray-600 dark:text-gray-300">
+<li class="flex items-center gap-3">
+<span class="material-icons-round text-green-500 text-lg">check_circle</span>
+                        ~100 Imagens Geradas
+                    </li>
+<li class="flex items-center gap-3">
+<span class="material-icons-round text-green-500 text-lg">check_circle</span>
+                        Acesso antecipado a temas novos
+                    </li>
+<li class="flex items-center gap-3">
+<span class="material-icons-round text-green-500 text-lg">check_circle</span>
+                        Alta Definição (HD)
+                    </li>
+<li class="flex items-center gap-3">
+<span class="material-icons-round text-green-500 text-lg">check_circle</span>
+                        Gerador de Stickers
+                    </li>
+</ul>
+<button class="w-full py-4 px-6 rounded-xl bg-secondary text-white font-bold hover:bg-secondary/90 shadow-lg hover:shadow-xl transition-all transform hover:scale-[1.02]">
+                    Escolher Entusiasta
+                </button>
+</div>
+<div class="bg-background-light dark:bg-gray-800 rounded-3xl p-8 shadow-xl border-2 border-transparent hover:border-white/50 transition duration-300 transform hover:-translate-y-1 group relative">
+<div class="absolute top-0 left-0 w-full h-2 bg-gray-800 dark:bg-gray-600 rounded-t-3xl"></div>
+<h3 class="text-xl font-bold text-gray-900 dark:text-white mb-2">Profissional</h3>
+<p class="text-gray-500 dark:text-gray-400 text-sm mb-6">Para uso comercial e alta demanda.</p>
+<div class="flex items-baseline mb-6">
+<span class="text-4xl font-extrabold text-gray-900 dark:text-white">R$ 99</span>
+<span class="text-gray-500 dark:text-gray-400 ml-2">/ único</span>
+</div>
+<div class="bg-primary/10 dark:bg-primary/20 rounded-xl p-4 mb-8 flex items-center justify-center gap-2">
+<span class="material-icons-round text-secondary dark:text-teal-300">token</span>
+<span class="font-bold text-secondary dark:text-teal-300 text-lg">500 Créditos</span>
+</div>
+<ul class="space-y-4 mb-8 text-sm text-gray-600 dark:text-gray-300">
+<li class="flex items-center gap-3">
+<span class="material-icons-round text-green-500 text-lg">check_circle</span>
+                        ~250 Imagens Geradas
+                    </li>
+<li class="flex items-center gap-3">
+<span class="material-icons-round text-green-500 text-lg">check_circle</span>
+                        Prioridade no processamento
+                    </li>
+<li class="flex items-center gap-3">
+<span class="material-icons-round text-green-500 text-lg">check_circle</span>
+                        Upscaling 4K
+                    </li>
+<li class="flex items-center gap-3">
+<span class="material-icons-round text-green-500 text-lg">check_circle</span>
+                        Licença Comercial
+                    </li>
+</ul>
+<button class="w-full py-3 px-6 rounded-xl border-2 border-gray-900 dark:border-gray-500 text-gray-900 dark:text-white font-bold hover:bg-gray-900 hover:text-white dark:hover:bg-white dark:hover:text-gray-900 transition-colors">
+                    Comprar Agora
+                </button>
+</div>
+</div>
+<div class="mt-20 w-full max-w-4xl bg-background-light dark:bg-gray-800/80 backdrop-blur-md rounded-2xl p-8 md:p-12 shadow-sm">
+<h3 class="text-2xl font-bold text-gray-900 dark:text-white text-center mb-8">Perguntas Frequentes</h3>
+<div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+<div>
+<h4 class="font-bold text-gray-800 dark:text-gray-200 mb-2 flex items-center gap-2">
+<span class="material-icons-round text-secondary text-sm">help</span>
+                        Os créditos expiram?
+                    </h4>
+<p class="text-sm text-gray-600 dark:text-gray-400 leading-relaxed">
+                        Não! Uma vez comprados, seus créditos são seus para sempre. Use quando a inspiração bater, seja hoje ou no próximo Natal.
+                    </p>
+</div>
+<div>
+<h4 class="font-bold text-gray-800 dark:text-gray-200 mb-2 flex items-center gap-2">
+<span class="material-icons-round text-secondary text-sm">help</span>
+                        Posso usar as fotos comercialmente?
+                    </h4>
+<p class="text-sm text-gray-600 dark:text-gray-400 leading-relaxed">
+                        Sim, se você adquirir o plano Profissional, você tem direito de uso comercial das imagens geradas.
+                    </p>
+</div>
+<div>
+<h4 class="font-bold text-gray-800 dark:text-gray-200 mb-2 flex items-center gap-2">
+<span class="material-icons-round text-secondary text-sm">help</span>
+                        Como funciona o reembolso?
+                    </h4>
+<p class="text-sm text-gray-600 dark:text-gray-400 leading-relaxed">
+                        Se você não gerou nenhuma imagem com seus créditos, oferecemos reembolso total em até 7 dias após a compra.
+                    </p>
+</div>
+<div>
+<h4 class="font-bold text-gray-800 dark:text-gray-200 mb-2 flex items-center gap-2">
+<span class="material-icons-round text-secondary text-sm">help</span>
+                        Quantas fotos preciso enviar?
+                    </h4>
+<p class="text-sm text-gray-600 dark:text-gray-400 leading-relaxed">
+                        Recomendamos entre 10 a 20 fotos variadas do seu pet para obter os melhores resultados possíveis com nossa IA.
+                    </p>
+</div>
+</div>
+</div>
+</main>
+<footer class="w-full py-8 text-center text-gray-800/60 dark:text-white/60 text-sm">
+<p>© 2023 PetFest. Todos os direitos reservados.</p>
+</footer>
+
+</body></html>
